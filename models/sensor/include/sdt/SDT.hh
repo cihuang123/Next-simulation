@@ -3,7 +3,7 @@
 #include <armadillo>
 #include <functional>
 #include "Module.hh"
-
+#include "nxbus_engine.h"
 class SDT : public Sensor {
   TRICK_INTERFACE(SDT);
 
@@ -26,6 +26,7 @@ class SDT : public Sensor {
 
   virtual arma::vec3 get_PHI() { return PHI; }
   virtual arma::vec3 get_DELTA_VEL() { return DELTA_VEL; }
+  virtual int write_to_(const char *bus_name) { return 0; }
 
  protected:
 

@@ -9,7 +9,7 @@ PURPOSE:
 #include "Module.hh"
 #include "global_constants.hh"
 #include "stochastic.hh"
-
+#include "nxbus_engine.h"
 class Accelerometer : public Sensor {
   TRICK_INTERFACE(Accelerometer);
 

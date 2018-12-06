@@ -1,5 +1,4 @@
 #include "accel/accelerometer_ideal.hh"
-#include "nxbus_engine.h"
 AccelerometerIdeal::AccelerometerIdeal(Data_exchang &input) {
   snprintf(name, sizeof(name), "Ideal Accelerometer Sensor");
   this->data_exchang = &input;
@@ -34,7 +33,7 @@ void AccelerometerIdeal::algorithm(double int_step) {
 
 int AccelerometerIdeal::write_to_(const char *bus_name) {
   int rc = 0;
-  rc |= nxbus_mset_vec("AccelerometerIdeal:_FSPCB", _FSPCB, 3);
-  rc |= nxbus_mset_vec("AccelerometerIdeal:_EFSPB", _EFSPB, 3);
+  rc |= nxbus_mset(NXBUS_DOUBLE, "Accelerometer:_FSPCB", 3, _FSPCB);
+  rc |= nxbus_mset(NXBUS_DOUBLE, "Accelerometer:_EFSPB", 3, _EFSPB);
   return rc;
 }

@@ -10,6 +10,7 @@ PURPOSE:
 #include "Module.hh"
 #include "global_constants.hh"
 #include "stochastic.hh"
+#include "nxbus_engine.h"
 
 class Gyro : public Sensor {
   TRICK_INTERFACE(Gyro);
@@ -25,6 +26,7 @@ class Gyro : public Sensor {
 
   virtual arma::vec3 get_computed_WBIB() { return WBICB; }
   virtual arma::vec3 get_error_of_computed_WBIB() { return EWBIB; }
+  virtual int write_to_(const char *bus_name) { return 0; }
 
   std::function<arma::vec3()> grab_WBIB;
   std::function<arma::vec3()> grab_FSPB;

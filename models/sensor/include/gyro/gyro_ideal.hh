@@ -23,6 +23,7 @@ class GyroIdeal : public Gyro {
   virtual ~GyroIdeal() {}
   virtual void init();
   virtual void algorithm(double int_step);
+  virtual int write_to_(const char *bus_name);
 };
 
 #endif  // __GYRO_IDEAL__

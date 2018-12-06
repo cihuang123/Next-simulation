@@ -11,6 +11,12 @@ if [ ! -f "/usr/local/include/hiredis/hiredis.h" ]; then
     make && sudo make install
 fi
 
+redis_pid_arr=( $(ps -aux | grep $USER | grep -E "redis-server\s\*\:[0-9]+" | awk '{print $2}') )
+redis_pid_arr_len=${#redis_pid_arr[@]}
+for name in "${redis_pid_arr[@]}"; do
+    kill $redis_pid_arr
+done
+
 redis-server &
 REDIS_SERVER_PID=$(echo $!)
 

@@ -23,6 +23,7 @@ class GyroRocket6G : public Gyro {
   virtual ~GyroRocket6G() {}
   virtual void init(){};
   virtual void algorithm(double int_step);
+  virtual int write_to_(const char *bus_name);
   std::default_random_engine generator;
 
  private:

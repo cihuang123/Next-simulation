@@ -23,6 +23,7 @@ class SDT_ideal : public SDT {
   virtual void init();
 
   virtual void algorithm(double int_step);
+  virtual int write_to_(const char *bus_name);
 
  private:
   arma::mat33 build_321_rotation_matrix(arma::vec3 angle);

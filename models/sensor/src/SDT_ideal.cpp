@@ -102,3 +102,10 @@ arma::mat33 SDT_ideal::build_321_rotation_matrix(arma::vec3 angle) {
 
   return TM;
 }
+
+int SDT_ideal::write_to_(const char *bus_name) {
+  int rc = 0;
+  rc |= nxbus_mset(NXBUS_DOUBLE, "SDT:_PHI", 3, _PHI);
+  rc |= nxbus_mset(NXBUS_DOUBLE, "SDT:_DELTA_VEL", 3, _DELTA_VEL);
+  return rc;
+}

@@ -39,3 +39,10 @@ void GyroIdeal::algorithm(double int_step) {
   data_exchang->hset("WBICB", WBICB);
   return;
 }
+
+int GyroIdeal::write_to_(const char *bus_name) {
+  int rc = 0;
+  rc |= nxbus_mset(NXBUS_DOUBLE, "Gyro:_WBICB", 3, _WBICB);
+  rc |= nxbus_mset(NXBUS_DOUBLE, "Gyro:_EWBIB", 3, _EWBIB);
+  return rc;
+}

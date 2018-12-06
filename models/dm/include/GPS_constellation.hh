@@ -22,7 +22,6 @@ PROGRAMMERS:
 #include "global_constants.hh"
 
 #include "time_utility.hh"
-
 struct range_t {
   time_util::GPS_TIME g;
   double range;
@@ -117,7 +116,7 @@ class GPS_constellation {
   transmit_channel *get_transmit_data();
   unsigned int get_gps_update() { return gps_update; }
   void clear_gps_flag() { gps_update = 0; }
-
+  int write_to_(const char *bus_name);
   std::function<arma::vec3()> grab_SBEE;
   std::function<arma::mat33()> grab_TEI;
   std::function<double()> grab_phibdx;
@@ -163,7 +162,7 @@ class GPS_constellation {
   int allocatedSat[MAX_SAT]; /* *o (--)                       */
 
   double gdop;             /* *io  (--)  Geometric Dilution of Precsision */
-  unsigned int gps_update; /* *o (--)       GPS update? > 0 updated */
+  uint32_t gps_update; /* *o (--)       GPS update? > 0 updated */
                            // arma::vec azel;
                            // double _azel[2];
 

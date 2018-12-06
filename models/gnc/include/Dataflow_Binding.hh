@@ -70,6 +70,8 @@
 }
 
 #define DM_SAVE_decl() void DM_SaveOutData(refactor_uplink_packet_t &dm_ins_db) { \
+    STORE_VEC(dm_ins_db.accel_FSPCB, accelerometer->get_computed_FSPB()); \
+    STORE_VEC(dm_ins_db.accel_EFSPB, accelerometer->get_error_of_computed_FSPB()); \
     dm_ins_db.gps_con_gps_update = gps_con.get_gps_update(); \
     STORE_VEC(dm_ins_db.trick_data.gyro_WBICB, gyro->get_computed_WBIB()); \
     STORE_VEC(dm_ins_db.trick_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB()); \

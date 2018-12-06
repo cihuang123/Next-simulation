@@ -22,6 +22,7 @@ class AccelerometerRocket6G : public Accelerometer {
   virtual ~AccelerometerRocket6G() {}
 
   virtual void algorithm(double int_step);
+  virtual int write_to_(const char *bus_name);
 
  private:
   VECTOR(EWALKA, 3); /* *o   (m/s2)  Acceleration random noise */
