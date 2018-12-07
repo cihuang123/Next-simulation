@@ -72,14 +72,12 @@ void ENG::set_ENG_HINGE_POS(double x, double y, double z) {
   ENG_HINGE_POS(2) = z;
 }
 
-void ENG::set_ENG_Dir(int type_in) {
-  type = static_cast<EngType>(type_in);
-}
+void ENG::set_ENG_Dir(int type_in) { type = static_cast<EngType>(type_in); }
 
 void ENG::Allocate_Actuator(int NumAct, enum ActDynType TYPE) {
   switch (TYPE) {
     case FIRST: {
-      ACT_1st **act_list = new ACT_1st *[NumAct];
+      ACT_1st** act_list = new ACT_1st*[NumAct];
       for (int i = 0; i < NumAct; i++) {
         act_list[i] = new ACT_1st;
         Act_list.push_back(act_list[i]);
@@ -166,4 +164,136 @@ void ENG::calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
              -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_5);
   Q(5) = dot(trans(TBI) * trans(T_N_B) * THRUST,
              -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_6);
+}
+
+RCS_Thruster::RCS_Thruster()
+    : VECTOR_INIT(Q, 6),
+      VECTOR_INIT(RHO, 3),
+      VECTOR_INIT(RCS_GAMMA_1, 3),
+      VECTOR_INIT(RCS_GAMMA_2, 3),
+      VECTOR_INIT(RCS_GAMMA_3, 3),
+      VECTOR_INIT(RCS_BETA_4, 3),
+      VECTOR_INIT(RCS_BETA_5, 3),
+      VECTOR_INIT(RCS_BETA_6, 3) {
+  this->saved_value = 0;
+  RCS_GAMMA_1(0) = RCS_BETA_4(0) = 1.0;
+  RCS_GAMMA_1(1) = RCS_BETA_4(1) = 0.0;
+  RCS_GAMMA_1(2) = RCS_BETA_4(2) = 0.0;
+
+  RCS_GAMMA_2(0) = RCS_BETA_5(0) = 0.0;
+  RCS_GAMMA_2(1) = RCS_BETA_5(1) = 1.0;
+  RCS_GAMMA_2(2) = RCS_BETA_5(2) = 0.0;
+
+  RCS_GAMMA_3(0) = RCS_BETA_6(0) = 0.0;
+  RCS_GAMMA_3(1) = RCS_BETA_6(1) = 0.0;
+  RCS_GAMMA_3(2) = RCS_BETA_6(2) = 1.0;
+}
+
+RCS_Thruster::RCS_Thruster(const RCS_Thruster& other)
+    : VECTOR_INIT(Q, 6),
+      VECTOR_INIT(RHO, 3),
+      VECTOR_INIT(RCS_GAMMA_1, 3),
+      VECTOR_INIT(RCS_GAMMA_2, 3),
+      VECTOR_INIT(RCS_GAMMA_3, 3),
+      VECTOR_INIT(RCS_BETA_4, 3),
+      VECTOR_INIT(RCS_BETA_5, 3),
+      VECTOR_INIT(RCS_BETA_6, 3) {
+  this->saved_value = other.saved_value;
+  this->dead_zone = other.dead_zone;
+  this->hysteresis = other.hysteresis;
+  this->thrust = other.thrust;
+  this->Q = other.Q;
+  this->RHO = other.RHO;
+  this->RCS_GAMMA_1 = other.RCS_GAMMA_1;
+  this->RCS_GAMMA_2 = other.RCS_GAMMA_2;
+  this->RCS_GAMMA_3 = other.RCS_GAMMA_3;
+  this->RCS_BETA_4 = other.RCS_BETA_4;
+  this->RCS_BETA_5 = other.RCS_BETA_5;
+  this->RCS_BETA_6 = other.RCS_BETA_6;
+  this->mode = other.mode;
+}
+
+RCS_Thruster& RCS_Thruster::operator=(const RCS_Thruster& other) {
+  if (&other == this) return *this;
+
+  this->saved_value = other.saved_value;
+  this->dead_zone = other.dead_zone;
+  this->hysteresis = other.hysteresis;
+  this->thrust = other.thrust;
+  this->Q = other.Q;
+  this->RHO = other.RHO;
+  this->RCS_GAMMA_1 = other.RCS_GAMMA_1;
+  this->RCS_GAMMA_2 = other.RCS_GAMMA_2;
+  this->RCS_GAMMA_3 = other.RCS_GAMMA_3;
+  this->RCS_BETA_4 = other.RCS_BETA_4;
+  this->RCS_BETA_5 = other.RCS_BETA_5;
+  this->RCS_BETA_6 = other.RCS_BETA_6;
+  this->mode = other.mode;
+  return *this;
+}
+
+void RCS_Thruster::calculate_Q(double input, arma::mat33 TBI,
+                               enum EngType type_in) {
+  arma::vec3 Thruster_T;
+
+  switch (type_in) {
+    case X:
+      Thruster_T(0) = thrust;
+      Thruster_T(1) = 0.0;
+      Thruster_T(2) = 0.0;
+      break;
+
+    case Y:
+      Thruster_T(0) = 0.0;
+      Thruster_T(1) = thrust;
+      Thruster_T(2) = 0.0;
+      break;
+
+    case Z:
+      Thruster_T(0) = 0.0;
+      Thruster_T(1) = 0.0;
+      Thruster_T(2) = thrust;
+      break;
+  }
+
+  Thruster_T = Schmitt_trigger(input) * Thruster_T;
+
+  Q(0) = dot(trans(TBI) * Thruster_T, RCS_GAMMA_1);
+  Q(1) = dot(trans(TBI) * Thruster_T, RCS_GAMMA_2);
+  Q(2) = dot(trans(TBI) * Thruster_T, RCS_GAMMA_3);
+  Q(3) = dot(trans(TBI) * Thruster_T,
+             -trans(TBI) * cross_matrix(RHO) * RCS_BETA_4);
+  Q(4) = dot(trans(TBI) * Thruster_T,
+             -trans(TBI) * cross_matrix(RHO) * RCS_BETA_5);
+  Q(5) = dot(trans(TBI) * Thruster_T,
+             -trans(TBI) * cross_matrix(RHO) * RCS_BETA_6);
+}
+
+int RCS_Thruster::Schmitt_trigger(double in) {
+  // local variable
+  int output(0);
+
+  // saved_value signal 'trend' (=1 increasing, =-1 decreasing)
+  // saved_value signal 'side' (=-1 left, =1 right)
+  int trend = sign(in - saved_value);
+  int side = sign(saved_value);
+  double trigger = (dead_zone * side + hysteresis * trend) / 2;
+
+  if (saved_value >= trigger && side == 1) {
+    output = 1;
+  } else if (saved_value <= trigger && side == -1) {
+    output = -1;
+  } else {
+    output = 0;
+  }
+
+  saved_value = in;
+
+  return output;
+}
+
+void RCS_Thruster::clear() {
+  this->saved_value = 0;
+
+  return;
 }
