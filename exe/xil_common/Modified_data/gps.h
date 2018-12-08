@@ -287,8 +287,10 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.forces.C_c");
     // drg->add_variable("rkt.forces.C_1");
     // drg->add_variable("rkt.forces.Wn");
-    // drg->add_variable("rkt.aerodynamics.cx");
-    // drg->add_variable("rkt.aerodynamics.cy");
+    drg->add_variable("rkt.propulsion._XCG[0]");
+    drg->add_variable("rkt.aerodynamics._XCP[0]");
+    drg->add_variable("rkt.aerodynamics.static_margin_p_1");
+    drg->add_variable("rkt.aerodynamics.static_margin_p_2");
     // drg->add_variable("rkt.aerodynamics.cz");
     add_data_record_group(drg, Trick::DR_Buffer);
     drg->enable();
