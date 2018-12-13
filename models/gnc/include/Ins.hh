@@ -85,6 +85,8 @@ class INS {
   double get_thtbdcx();
   double get_psibdcx();
   double get_thtvdcx();
+  double get_phipcx();
+  double get_alppcx();
 
   arma::vec3 get_SBIIC();
   arma::vec3 get_VBIIC();
@@ -98,6 +100,7 @@ class INS {
   arma::mat33 get_TBD();
   arma::mat33 get_TBICI();
   arma::mat33 get_TDCI();
+  arma::vec3 get_WBECB();
 
   /* Internal Initializers */
   void default_data();
@@ -246,6 +249,8 @@ class INS {
 
   arma::vec VBIIC_old_old;
   double _VBIIC_old_old[3];
+
+  VECTOR(WBECB, 3); /* ** (r/s)  Body angular rate in ECEF */
 
   double
       dbic; /* *io  (m)     INS computed vehicle distance from Earth center */
