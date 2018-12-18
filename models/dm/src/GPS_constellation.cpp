@@ -1450,6 +1450,7 @@ transmit_channel *GPS_constellation::get_transmit_data() {
 
 int GPS_constellation::write_to_(const char *bus_name) {
   int rc = 0;
-  rc |= nxbus_mset(NXBUS_UINT32, "GPS_constellation:gps_con_gps_update", 1, &gps_update);
+  rc |= nxbus_mset(NXBUS_UINT32, "GPS_constellation:gps_con_gps_update", 1,
+                   &gps_update);
   return rc;
 }

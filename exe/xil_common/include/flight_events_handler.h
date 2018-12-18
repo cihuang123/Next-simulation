@@ -12,7 +12,12 @@ const double THTBDX         = 90.0;  //  Pitching angle of veh wrt geod coord - 
 const double PSIBDX         = 90.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
 const double ALPHA0X        = 0;    // Initial angle-of-attack   - deg  module newton
 const double BETA0X         = 0;    // Initial sideslip angle    - deg  module newton
-const double DVBE           = 1.0;    // Vehicle geographic speed  - m/s  module newton
+const double DVBE           = 0.0;    // Vehicle geographic speed  - m/s  module newton
+const double RCS_POS        = -2.66507;  // RCS thruster position, from nose
+const double RCS_DEADZONE   = 0.1;   //  Dead zone of Schmitt trigger
+const double RCS_HYSTERESIS = 0.0;   //  Hysteresis of Schmitt trigger
+const double RCS_THRUST     = 5.0;   //  RCS thrust
+const double RCS_D          = 0.68;   
 /* S1 */
 const double S1_XCG_0          = 11.735;    //  vehicle initial xcg
 const double S1_XCG_1          = 9.724;     //  vehicle final xcg
@@ -85,7 +90,6 @@ extern "C" int event_separation_1() {
     rkt.aerodynamics.set_refa(S2_refa);
     rkt.aerodynamics.set_refd(S2_refd);
     rkt.aerodynamics.load_aerotable("../../../tables/Aero_Insertion_S2.txt");
-    rkt.propulsion.set_aexit(0.0);
     rkt.propulsion.set_stage_2();
     // rkt.forces.set_reference_point(-3.917);  // set reference point
     rkt.dynamics.set_reference_point(S2_RP);
@@ -103,7 +107,6 @@ extern "C" int event_separation_2() {
     rkt.aerodynamics.set_refa(S3_refa);
     rkt.aerodynamics.set_refd(S3_refd);
     rkt.aerodynamics.load_aerotable("../../../tables/Aero_Insertion_S3.txt");
-    rkt.propulsion.set_aexit(0.0);
     rkt.propulsion.set_stage_3();
     // rkt.forces.set_reference_point(-3.917);  // set reference point
     rkt.dynamics.set_reference_point(S3_RP);
@@ -171,7 +174,7 @@ extern "C" void master_init_slv(Rocket_SimObject *rkt) {
 
 extern "C" void master_init_aerodynamics(Rocket_SimObject *rkt) {
     /************************************aerodynamics*******************************************************/
-    rkt->aerodynamics.load_aerotable("../../../tables/Aero_Insertion_S1");
+    rkt->aerodynamics.load_aerotable("../../../tables/Aero_Insertion_S1.txt");
     rkt->aerodynamics.set_refa(S1_refa);       // Reference area for aero coefficients - m^2
     rkt->aerodynamics.set_refd(S1_refd);     // Reference length for aero coefficients - m
     /********************************************************************************************************/
@@ -180,7 +183,9 @@ extern "C" void master_init_aerodynamics(Rocket_SimObject *rkt) {
 extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     /******************************propulsion & mass property***************************************************************************/
     rkt->propulsion.Allocate_stage(3);
-    // rkt->propulsion.set_stage_var(S2_SPI, S2_STRUCTURE_MASS, S2_PROPELLANT_MASS, S2_REMAINING_FUEL_MASS, 0);
+    rkt->propulsion.set_stage_var(S1_SPI, S1_fmass0, S1_vmass0, 0.0, S1_FUEL_FLOW_RATE, S1_XCG_0, S1_XCG_1,
+                                     S1_MOI_ROLL_0, S1_MOI_ROLL_1, S1_MOI_PITCH_0, S1_MOI_PITCH_1, S1_MOI_YAW_0, S1_MOI_YAW_1, 
+                                     0);
     rkt->dynamics.set_reference_point(S1_RP);
     rkt->propulsion.set_stage_1();
     rkt->propulsion.set_no_thrust();
@@ -263,17 +268,45 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     }
 }
 
+extern "C" void master_init_rcs(Rocket_SimObject *rkt) {
+    rkt->rcs.Allocate_RCS(6, rkt->rcs.Thruster_list);
+
+    // Thruster 1
+    rkt->rcs.Thruster_list[0]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 1);
+    rkt->rcs.Thruster_list[0]->set_RHO(RCS_POS - S1_RP, 0.0, -RCS_D);
+
+    // Thruster 2
+    rkt->rcs.Thruster_list[1]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 1);
+    rkt->rcs.Thruster_list[1]->set_RHO(RCS_POS - S1_RP, 0.0, RCS_D);
+
+    // Thruster 3
+    rkt->rcs.Thruster_list[2]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 2);
+    rkt->rcs.Thruster_list[2]->set_RHO(RCS_POS - S1_RP, 0.0, -RCS_D);
+
+    // Thruster 4
+    rkt->rcs.Thruster_list[3]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 1);
+    rkt->rcs.Thruster_list[3]->set_RHO(RCS_POS - S1_RP, RCS_D, 0.0);
+
+    // Thruster 5
+    rkt->rcs.Thruster_list[4]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 2);
+    rkt->rcs.Thruster_list[4]->set_RHO(RCS_POS - S1_RP, 0.0, RCS_D);
+
+    // Thruster 6
+    rkt->rcs.Thruster_list[5]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 1);
+    rkt->rcs.Thruster_list[5]->set_RHO(RCS_POS - S1_RP, -RCS_D, 0.0);
+}
+
 extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     /* events */
     jit_add_event("event_start", "LIFTOFF", 0.005);
-    jit_add_event("event_separation_1", "S2", 0.005);
-    jit_add_event("event_separation_2", "S3", 0.005);
-    jit_add_event("event_S3_ignition", "S3IG", 0.005);
+    // jit_add_event("event_separation_1", "S2", 0.005);
+    // jit_add_event("event_separation_2", "S3", 0.005);
+    // jit_add_event("event_S3_ignition", "S3IG", 0.005);
     // jit_add_read(102.051 + rkt->stand_still_time, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
     // jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.005);
     // jit_add_event("event_hot_staging", "HOT_STAGING", 0.005);
-    exec_set_terminate_time(350.001  + rkt->stand_still_time);
+    exec_set_terminate_time(20.001  + rkt->stand_still_time);
 }
 
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_

@@ -70,7 +70,13 @@ void Control::default_data() {}
 double Control::get_delecx() { return delecx; }
 double Control::get_delrcx() { return delrcx; }
 
-void Control::initialize() { fmasse = -mdot * 0.05; }
+void Control::initialize() {
+  fmasse = -mdot * 0.05;
+  theta_a_cmd = 0.0;
+  theta_b_cmd = 0.0;
+  theta_c_cmd = 0.0;
+  theta_d_cmd = 0.0;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // 'control' module
@@ -95,99 +101,32 @@ void Control::control(double int_step) {
   double altc = grab_altc();
   euler = euler_angle(TBL);
 
-  // calculate_xcg_thrust(int_step);
+  calculate_xcg_thrust(int_step);
 
   switch (maut) {
     case NO_CONTROL:
       return;
       break;
 
-    case S2_PITCH_DOWN_I:
-      // Quaternion_cmd(int_step);
-      calculate_xcg_thrust(int_step);
-      pitchcmd_new = 0.02439 * pitchcmd + 0.02439 * pitchcmd_old +
-                     0.9512 * pitchcmd_out_old;
-      pitchcmd_old = pitchcmd;
-      pitchcmd_out_old = pitchcmd_new;
-      delta_euler(0) = rollcmd * RAD - euler(0);
-      delta_euler(1) = pitchcmd_new * RAD - euler(1);
-      delta_euler(2) = yawcmd * RAD - euler(2);
-      // pitch_down(CMDQ(2), int_step);
-      // roll_control(CMDQ(1), int_step);
-      // yaw_control(CMDQ(3), int_step);
-      pitch_down(0.5 * delta_euler(1), int_step);
-      roll_control(0.5 * delta_euler(0), int_step);
-      yaw_control(0.5 * delta_euler(2), int_step);
-      // pitch_down_test(1.0, int_step);
-      S2_B_pseudo_G(CONTROLCMD, int_step);
-      break;
-
-    case S2_PITCH_DOWN_II:
-      // Quaternion_cmd(int_step);
-      calculate_xcg_thrust(int_step);
-      pitchcmd_new = -1.0 - ((altc - 2000.0) / 4000.0);
-
-      if (fabs(pitchcmd_new) >= fabs(pitchcmd)) pitchcmd_new = pitchcmd;
-
-      delta_euler(0) = rollcmd * RAD - euler(0);
-      delta_euler(1) = pitchcmd_new * RAD - euler(1);
-      delta_euler(2) = yawcmd * RAD - euler(2);
-      // pitch_down(CMDQ(2), int_step);
-      // roll_control(CMDQ(1), int_step);
-      // yaw_control(CMDQ(3), int_step);
-      pitch_down(0.5 * delta_euler(1), int_step);
-      roll_control(0.5 * delta_euler(0), int_step);
-      yaw_control(0.5 * delta_euler(2), int_step);
-      // pitch_down_test(1.0, int_step);
-      S2_B_pseudo_G(CONTROLCMD, int_step);
-      break;
-
-    case S2_ROLL_CONTROL:
-      // Quaternion_cmd(int_step);
-      calculate_xcg_thrust(int_step);
-      delta_euler(0) = rollcmd * RAD - euler(0);
-      delta_euler(1) = 0.0 - euler(1);
-      delta_euler(2) = yawcmd * RAD - euler(2);
-      pitch_down(0.5 * delta_euler(1), int_step);
-      roll_control(0.5 * delta_euler(0), int_step);
-      yaw_control(0.5 * delta_euler(2), int_step);
-      // pitch_down_test(1.0, int_step);
-      S2_B_pseudo_G(CONTROLCMD, int_step);
-      break;
-
-    case S3_PITCH_DOWN:
+    case ACC_CONTROL_ON:
       // calculate_xcg_thrust(int_step);
-      Quaternion_cmd(int_step);
-      pitch_down(CMDQ(2), int_step);
-      roll_control(CMDQ(1), int_step);
-      yaw_control(CMDQ(3), int_step);
-      S3_B_pseudo_G(CONTROLCMD, int_step);
-      break;
-    case S2_AOA:
-      // Quaternion_cmd(int_step);
-      calculate_xcg_thrust(int_step);
-      delta_euler(0) = rollcmd * RAD - euler(0);
-      // delta_euler(1) = 0.0  - euler(1);
-      delta_euler(2) = yawcmd * RAD - euler(2);
-      AOA_control(aoacmd * RAD, int_step);
-      roll_control(0.5 * delta_euler(0), int_step);
-      yaw_control(0.5 * delta_euler(2), int_step);
-      S2_B_pseudo_G(CONTROLCMD, int_step);
-      break;
-    case S3_AOA:
-      // Quaternion_cmd(int_step);
-      calculate_xcg_thrust(int_step);
-      delta_euler(0) = rollcmd * RAD - euler(0);
-      // delta_euler(1) = 0.0  - euler(1);
-      delta_euler(2) = yawcmd * RAD - euler(2);
-      AOA_control(aoacmd * RAD, int_step);
-      roll_control(0.5 * delta_euler(0), int_step);
-      yaw_control(0.5 * delta_euler(2), int_step);
-      S3_B_pseudo_G(CONTROLCMD, int_step);
+      aerodynamics_der();
+      delecx = control_normal_accel(ancomx, int_step);
+      delrcx = control_yaw_accel(alcomx, int_step);
+      theta_a_cmd = delecx;
+      theta_b_cmd = delrcx;
       break;
     default:
       break;
   }
+}
+
+void Control::load_aerotable(const char* filename) {
+  aerotable = Datadeck(filename);
+}
+
+void Control::atmosphere_use_nasa() {
+  atmosphere = new cad::Atmosphere_nasa2002();
 }
 
 void Control::Quaternion_cmd(double int_step) {
@@ -221,6 +160,11 @@ void Control::Quaternion_cmd(double int_step) {
   CMDQ = Quaternion_cross(TDBQ, TCMDQ);
 
   CMDQ = sign(CMDQ(0)) * CMDQ;
+}
+
+void Control::set_close_loop_pole(double in1, double in2) {
+  zaclp = in1;
+  zacly = in2;
 }
 
 void Control::set_thtvdcomx(double in) { this->thtvdcomx = in; }
@@ -467,6 +411,11 @@ void Control::set_S3_AOA() { maut = S3_AOA; }
 void Control::set_S3_PITCH_DOWN() { maut = S3_PITCH_DOWN; }
 void Control::set_S2_ROLL_CONTROL() { maut = S2_ROLL_CONTROL; }
 void Control::set_NO_CONTROL() { maut = NO_CONTROL; }
+void Control::set_acc_control() { maut = ACC_CONTROL_ON; }
+void Control::set_aero_coffe(double in1, double in2) {
+  refd = in1;
+  refa = in2;
+}
 double Control::get_theta_a_cmd() { return theta_a_cmd; }
 double Control::get_theta_b_cmd() { return theta_b_cmd; }
 double Control::get_theta_c_cmd() { return theta_c_cmd; }
@@ -623,7 +572,6 @@ void Control::aerodynamics_der() {
   double phipcx = grab_phipcx();
   double alppcx = grab_alppcx();
   arma::vec3 WBECB = grab_WBECB();
-  int thrust_state = grab_thrust_state();
 
   //-------------------------------------------------------------------------
   // MOI components
@@ -673,8 +621,8 @@ void Control::aerodynamics_der() {
 
   // calculating normal force dim derivative wrt alpha 'cla'
 
-  double cn0p = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx);
-  double cn0m = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx);
+  double cn0p = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx, 1);
+  double cn0m = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx, 1);
 
   // replacing value from previous cycle, only if within max alpha limit
   // if(alplx<alplimx)
@@ -682,8 +630,8 @@ void Control::aerodynamics_der() {
 
   // calculating pitch moment dim derivative wrt alpha 'cma'
 
-  double clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx);
-  double clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx);
+  double clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx, 1);
+  double clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx, 1);
 
   // replacing value from previous cycle, only if within max alpha limit
   // if(alppcx<alplimx)
@@ -789,6 +737,8 @@ void Control::aerodynamics_der() {
   }
 }
 
+void Control::set_ancomx(double in) { ancomx = in; }
+void Control::set_alcomx(double in) { alcomx = in; }
 ///////////////////////////////////////////////////////////////////////////////
 // Acceleration controller in normal (pitch) plane
 // Member function of class 'Control'
@@ -819,8 +769,8 @@ double Control::control_normal_accel(double ancomx, double int_step) {
 
   // input from other modules
   double dvbec = grab_dvbec();
-  arma::vec3 WBECB = grab_WBECB();
-  arma::vec3 FSPCB = grab_FSPCB();
+  arma::vec3 WBICB = grab_computed_WBIB();
+  arma::vec3 ABICB = grab_ABICB();
   //-------------------------------------------------------------------------
   // calculating online close loop poles
   waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
@@ -840,20 +790,20 @@ double Control::control_normal_accel(double ancomx, double int_step) {
   // gainfb1=(zaclp*zaclp*waclp*waclp+2.*zaclp*waclp*paclp+dma+dmq*dla/dvbec-gainfb2*dmde*dla/dvbec)-gainp;
 
   // pitch loop acceleration control, pitch control command
-  double fspb3 = FSPCB[2];
-  double zzd_new = AGRAV * ancomx + fspb3;
+  double abib3 = ABICB[2];
+  double zzd_new = AGRAV * ancomx + abib3;
   zz = integrate(zzd_new, zzd, zz, int_step);
   zzd = zzd_new;
-  double dqc = -gainfb1 * (-fspb3) - gainfb2 * WBECB(1) * RAD + gainfb3 * zz +
-               gainp * zzd;
-  double delecx = dqc * DEG;
+  double dqc =
+      -gainfb1 * (-abib3) - gainfb2 * WBICB(1) + gainfb3 * zz + gainp * zzd;
+  // double delecx = dqc * DEG;
 
   // diagnostic output
   GAINFP = arma::vec3({gainfb1, gainfb2, gainfb3});
   //--------------------------------------------------------------------------
   // loading module-variables
 
-  return delecx;
+  return dqc;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -882,8 +832,8 @@ double Control::control_normal_accel(double ancomx, double int_step) {
 double Control::control_yaw_accel(double alcomx, double int_step) {
   // input from other modules
   double dvbec = grab_dvbec();
-  arma::vec3 WBECB = grab_WBECB();
-  arma::vec3 FSPCB = grab_FSPCB();
+  arma::vec3 WBICB = grab_computed_WBIB();
+  arma::vec3 ABICB = grab_ABICB();
 
   //-------------------------------------------------------------------------
   // calculating close loop poles
@@ -899,19 +849,19 @@ double Control::control_yaw_accel(double alcomx, double int_step) {
                    gainy;
 
   // yaw loop acceleration controller, yaw control command
-  double fspb2 = FSPCB(1, 0);
-  double yyd_new = AGRAV * alcomx - fspb2;
+  double abib2 = ABICB(1);
+  double yyd_new = AGRAV * alcomx - abib2;
   yy = integrate(yyd_new, yyd, yy, int_step);
   yyd = yyd_new;
   double drc =
-      -gainfb1 * fspb2 - gainfb2 * WBECB(3) * RAD + gainfb3 * yy + gainy * yyd;
-  double drcx = drc * DEG;
+      -gainfb1 * abib2 - gainfb2 * WBICB(2) + gainfb3 * yy + gainy * yyd;
+  // double drcx = drc * DEG;
 
   // diagnostic output
   GAINFY = arma::vec3({gainfb1, gainfb2, gainfb3});
   //--------------------------------------------------------------------------
 
-  return drcx;
+  return drc;
 }
 //--------------------------------------------------------------------------------
 ///////////////////////////////////////////////////////////////////////////////

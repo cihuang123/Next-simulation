@@ -27,10 +27,9 @@ class Control {
   void initialize();
 
   void control(double int_step);
-  double control_normal_accel(double ancomx, double int_step);
-  double control_yaw_accel(double alcomx, double int_step);
   // double control_pitch_rate(double qqdx);
   // double control_gamma(double thtvdcomx);
+  void set_close_loop_pole(double in1, double in2);
   void set_thtvdcomx(double in);
   // void set_maut(double in);
   void set_delimx(double in);
@@ -45,6 +44,7 @@ class Control {
   void S2_B_pseudo_G(arma::vec3 cmd, double int_step);
   void S3_B_pseudo_G(arma::vec3 cmd, double int_step);
 
+  void set_aero_coffe(double in1, double in2);
   void set_IBBB0(double in1, double in2, double in3);
   void set_IBBB1(double in1, double in2, double in3);
   void set_controller_var(double in1, double in2, double in3, double in4,
@@ -56,6 +56,7 @@ class Control {
   void set_NO_CONTROL();
   void set_S2_AOA();
   void set_S3_AOA();
+  void set_acc_control();
   void set_kpp(double in);
   void set_kpi(double in);
   void set_kppp(double in);
@@ -85,10 +86,14 @@ class Control {
   void set_ierror_zero();
   void set_reference_point(double in);
   void set_engine_d(double in);
-
+  void load_aerotable(const char* filename);
+  void atmosphere_use_nasa();
   void pitch_down_test(double pitchcmd, double int_step);
 
   arma::vec3 euler_angle(arma::mat33 TBD);
+
+  void set_ancomx(double in);
+  void set_alcomx(double in);
 
   enum CONTROL_TYPE {
     NO_CONTROL = 0,
@@ -97,7 +102,8 @@ class Control {
     S2_ROLL_CONTROL,
     S3_PITCH_DOWN,
     S2_AOA,
-    S3_AOA
+    S3_AOA,
+    ACC_CONTROL_ON
   };
   ///////////////////////////////////////////////////////////////////////////////
   // Definition of control module-variables
@@ -155,6 +161,7 @@ class Control {
   std::function<arma::mat33()> grab_TBICI;
   std::function<arma::mat33()> grab_TBIC;
   std::function<arma::vec3()> grab_WBECB;
+  std::function<arma::vec3()> grab_ABICB;
 
   double get_delecx();
   double get_delrcx();
@@ -165,6 +172,9 @@ class Control {
 
  private:
   cad::Atmosphere* atmosphere;
+
+  double control_normal_accel(double ancomx, double int_step);
+  double control_yaw_accel(double alcomx, double int_step);
   void aerodynamics_der();
   void default_data();
 

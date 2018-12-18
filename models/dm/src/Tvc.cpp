@@ -145,7 +145,6 @@ void TVC::algorithm(double int_step) {
 
 enum TVC::TVC_TYPE TVC::get_mtvc() { return mtvc; }
 void TVC::set_mtvc(enum TVC_TYPE in) { mtvc = in; }
-
+void TVC::set_S1_TVC() { this->mtvc = S1_TVC; }
 void TVC::set_S2_TVC() { this->mtvc = S2_TVC; }
-
 void TVC::set_S3_TVC() { this->mtvc = S3_TVC; }

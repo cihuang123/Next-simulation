@@ -56,6 +56,7 @@ typedef struct __attribute__((packed)) {
   double ins_TBICI[3][3];
   double ins_TBIC[3][3];
   double ins_WBECB[3];
+  double ins_ABICB[3];
 
   double ins_alphacx;
   double ins_psibdcx;
@@ -73,6 +74,9 @@ typedef struct __attribute__((packed)) {
   double theta_b_cmd;
   double theta_c_cmd;
   double theta_d_cmd;
+  double e_roll;
+  double e_pitch;
+  double e_yaw;
   uint64_t flight_event_code;
 } refactor_downlink_packet_t;
 

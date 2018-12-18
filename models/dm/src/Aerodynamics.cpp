@@ -58,7 +58,7 @@ void AeroDynamics::load_aerotable(const char* filename) {
 
 void AeroDynamics::set_refa(double in) { refa = in; }
 void AeroDynamics::set_refd(double in) { refd = in; }
-
+void AeroDynamics::set_XCP(double in) { XCP(0) = in; }
 void AeroDynamics::algorithm(double int_step) {
   /* only calculate when rocket liftoff */
   int liftoff;

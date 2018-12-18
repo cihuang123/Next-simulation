@@ -221,12 +221,12 @@ void EarthEnvironment::atmosphere_use_weather_deck(char* filename) {
 void EarthEnvironment::set_no_wind() { wind = new cad::Wind_No(); }
 
 void EarthEnvironment::set_constant_wind(double dvae, double dir, double twind,
-                                    double vertical_wind) {
+                                         double vertical_wind) {
   wind = new cad::Wind_Constant(dvae, dir, twind, vertical_wind);
 }
 
 void EarthEnvironment::set_tabular_wind(char* filename, double twind,
-                                   double vertical_wind) {
+                                        double vertical_wind) {
   wind = new cad::Wind_Tabular(filename, twind, vertical_wind);
 }
 
@@ -234,10 +234,11 @@ void EarthEnvironment::set_no_wind_turbulunce() {
   if (wind) wind->disable_turbulance();
 }
 
-void EarthEnvironment::set_wind_turbulunce(double turb_length, double turb_sigma,
-                                      double taux1, double taux1d, double taux2,
-                                      double taux2d, double tau,
-                                      double gauss_value) {
+void EarthEnvironment::set_wind_turbulunce(double turb_length,
+                                           double turb_sigma, double taux1,
+                                           double taux1d, double taux2,
+                                           double taux2d, double tau,
+                                           double gauss_value) {
   if (wind)
     wind->enable_turbulance(turb_length, turb_sigma, taux1, taux1d, taux2,
                             taux2d, tau, gauss_value);
@@ -604,7 +605,8 @@ void EarthEnvironment::RNP() {
  *       acc         Gravitational acceleration
  *
  ********************************************************************************/
-arma::vec EarthEnvironment::AccelHarmonic(arma::vec3 SBII, int n_max, int m_max) {
+arma::vec EarthEnvironment::AccelHarmonic(arma::vec3 SBII, int n_max,
+                                          int m_max) {
   /* Local variables */
   int n, m;               /* Loop counters */
   double r_sqr, rho, Fac; /* Auxiliary quantities */

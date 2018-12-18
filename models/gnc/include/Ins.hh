@@ -101,6 +101,7 @@ class INS {
   arma::mat33 get_TBICI();
   arma::mat33 get_TDCI();
   arma::vec3 get_WBECB();
+  arma::vec3 get_ABICB();
 
   /* Internal Initializers */
   void default_data();
@@ -251,6 +252,8 @@ class INS {
   double _VBIIC_old_old[3];
 
   VECTOR(WBECB, 3); /* ** (r/s)  Body angular rate in ECEF */
+
+  VECTOR(ABICB, 3); /* **  (m/s2) Computed body net acceleration */
 
   double
       dbic; /* *io  (m)     INS computed vehicle distance from Earth center */

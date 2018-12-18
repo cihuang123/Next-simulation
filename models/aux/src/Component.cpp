@@ -277,7 +277,7 @@ int RCS_Thruster::Schmitt_trigger(double in) {
   // saved_value signal 'side' (=-1 left, =1 right)
   int trend = sign(in - saved_value);
   int side = sign(saved_value);
-  double trigger = (dead_zone * side + hysteresis * trend) / 2;
+  double trigger = (dead_zone * side + hysteresis * trend) / 2.0;
 
   if (saved_value >= trigger && side == 1) {
     output = 1;
@@ -296,4 +296,17 @@ void RCS_Thruster::clear() {
   this->saved_value = 0;
 
   return;
+}
+
+void RCS_Thruster::set_thruster_var(double in1, double in2, double in3, int in4) {
+  dead_zone = in1;
+  hysteresis = in2;
+  thrust = in3;
+  mode = static_cast<EngType> (in4);
+}
+
+void RCS_Thruster::set_RHO(double in1, double in2, double in3) {
+  RHO(0) = in1;
+  RHO(1) = in2;
+  RHO(2) = in3;
 }

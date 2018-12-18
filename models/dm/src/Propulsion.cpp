@@ -93,6 +93,11 @@ void Propulsion::set_stage_var(double isp, double fmass_init, double vmass_init,
                                double moi_roll1, double moi_pitch0,
                                double moi_pitch1, double moi_yaw0,
                                double moi_yaw1, unsigned int num_stage) {
+  Stage_var_list[num_stage]->IBBB0.zeros();
+  Stage_var_list[num_stage]->IBBB1.zeros();
+  Stage_var_list[num_stage]->XCG_0.zeros();
+  Stage_var_list[num_stage]->XCG_1.zeros();
+
   Stage_var_list[num_stage]->isp = isp;
   Stage_var_list[num_stage]->fmass0 = fmass_init;
   Stage_var_list[num_stage]->StageMass0 = vmass_init;
@@ -162,12 +167,8 @@ void Propulsion::algorithm(double int_step) {
           Stage_var_list[stage]->fmasse / Stage_var_list[stage]->fmass0;
       vmass = Stage_var_list[stage]->StageMass0 - Stage_var_list[stage]->fmasse;
       fmassr = Stage_var_list[stage]->fmass0 - Stage_var_list[stage]->fmasse;
-      IBBB = Stage_var_list[stage]->IBBB0 +
-             (Stage_var_list[stage]->IBBB1 - Stage_var_list[stage]->IBBB0) *
-                 mass_ratio;
-      XCG = Stage_var_list[stage]->XCG_0 +
-            (Stage_var_list[stage]->XCG_1 - Stage_var_list[stage]->XCG_0) *
-                mass_ratio;
+      IBBB = calculate_IBBB(stage);
+      XCG = calculate_XCG(stage);
       propagate_delta_v(int_step, Stage_var_list[stage]->isp,
                         Stage_var_list[stage]->fuel_flow_rate, vmass);
       if (fmassr <= 0.0) thrust_state = NO_THRUST;

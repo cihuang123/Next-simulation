@@ -32,8 +32,9 @@ class AeroDynamics : public Dynamics {
   virtual void init();
   virtual void algorithm(double int_step);
 
-  void set_refa(double);
-  void set_refd(double);
+  void set_refa(double in);
+  void set_refd(double in);
+  void set_XCP(double in);
 
  private:
   Propulsion* propulsion;

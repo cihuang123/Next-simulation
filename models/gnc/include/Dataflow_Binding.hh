@@ -52,6 +52,14 @@
     control.grab_WBECB = LINK(ins, get_WBECB);                         \
     control.grab_phipcx = GRAB_VAR(ins_ctl_db.ins_phipcx);             \
     control.grab_alppcx = GRAB_VAR(ins_ctl_db.ins_alppcx);             \
+    control.grab_ABICB = GRAB_VAR(ins_ctl_db.ins_ABICB);               \
+  }
+
+#define RCS_LINK_decl()                                                   \
+  void RcsLinkInData(RCS_FC &rcs_fc, refactor_ins_to_ctl_t &ins_ctl_db) { \
+    rcs_fc.grab_WBICB =                                                   \
+        GRAB_VAR(arma::vec3(ins_ctl_db.trick_data.gyro_WBICB));           \
+    rcs_fc.grab_phibdcx = GRAB_VAR(ins_ctl_db.ins_phibdcx);               \
   }
 
 #define INS_SAVE_decl()                                               \
@@ -74,6 +82,7 @@
     STORE_VEC(ins_ctl_db.ins_WBECB, ins.get_WBECB());                 \
     ins_ctl_db.ins_phipcx = ins.get_phipcx();                         \
     ins_ctl_db.ins_alppcx = ins.get_alppcx();                         \
+    STORE_VEC(ins_ctl_db.ins_ABICB, ins.get_ABICB());                 \
   }
 
 #define CONTROL_SAVE_decl()                                          \
@@ -83,6 +92,14 @@
     ctl_tvc_db.theta_b_cmd = control.get_theta_b_cmd();              \
     ctl_tvc_db.theta_c_cmd = control.get_theta_c_cmd();              \
     ctl_tvc_db.theta_d_cmd = control.get_theta_d_cmd();              \
+  }
+
+#define RCS_SAVE_decl()                                          \
+  void RCS_SaveOutData(RCS_FC &rcs_fc,                           \
+                       refactor_downlink_packet_t &ctl_tvc_db) { \
+    ctl_tvc_db.e_roll = rcs_fc.get_e_roll();                     \
+    ctl_tvc_db.e_pitch = rcs_fc.get_e_pitch();                   \
+    ctl_tvc_db.e_yaw = rcs_fc.get_e_yaw();                       \
   }
 
 #define DM_SAVE_decl()                                                     \

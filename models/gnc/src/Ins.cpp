@@ -154,7 +154,8 @@ INS::INS()
       MATRIX_INIT(TBICI, 3, 3),
       VECTOR_INIT(GRAVGI, 3),
       MATRIX_INIT(TLI, 3, 3),
-      VECTOR_INIT(WBECB, 3) {
+      VECTOR_INIT(WBECB, 3),
+      VECTOR_INIT(ABICB, 3) {
   this->default_data();
   this->liftoff = 0;
 }
@@ -613,6 +614,7 @@ void INS::update(double int_step) {
   arma::vec3 PHI, PHI_HIGH, PHI_LOW, DELTA_VEL;
   // Gyro Measurement
   arma::vec3 WBICB = grab_computed_WBIB();
+  arma::vec3 FSPCB = grab_computed_FSPB();
 
   // if (ideal == 1) {
   PHI = grab_PHI();
@@ -652,7 +654,10 @@ void INS::update(double int_step) {
 
   SBEEC = TEIC * SBIIC;
   VBEEC = TEIC * VBIIC - WEII * SBEEC;
-  WBECB = WBICB - TBIC * WEII;
+  arma::vec3 WEIE;
+  WEIE(2) = WEII3;
+  WBECB = WBICB - TBIC * trans(TEIC) * WEIE;
+  ABICB = FSPCB + TBIC * GRAVGI;
 
   arma::vec3 VBECB = TBIC * trans(TEIC) * VBEEC;
 
@@ -718,6 +723,7 @@ arma::mat33 INS::get_TBD() { return TBD; }
 arma::mat33 INS::get_TBICI() { return TBICI; }
 arma::mat33 INS::get_TDCI() { return TDCI; }
 arma::vec3 INS::get_WBECB() { return WBECB; }
+arma::vec3 INS::get_ABICB() { return ABICB; }
 
 void INS::set_gps_correction(unsigned int index) { gpsupdate = index; }
 

@@ -17,6 +17,7 @@ LIBRARY DEPENDENCIES:
 ##include "icf_trx_ctrl.h"
 ##include "DM_FSW_Interface.hh"
 ##include "flight_events_define.h"
+##include "RcsFc.hh"
 
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
@@ -26,6 +27,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         INS ins;
 
         Control control;
+        RCS_FC rcs_fc;
 
         time_management *time = time_management::get_instance();
         uint64_t egse_flight_event_trigger_bitmap = 0xFFFFFFFFFFFFFFFF;
@@ -40,14 +42,17 @@ class FlightComputer_SimObject : public Trick::SimObject {
         GPS_LINK_decl();
         INS_LINK_decl();
         CONTROL_LINK_decl();
+        RCS_LINK_decl();
 
         INS_SAVE_decl();
         CONTROL_SAVE_decl();
+        RCS_SAVE_decl();
 
         void link(){
             GPSLinkInData(gps, dm_ins_db, ins);
             INSLinkInData(ins, dm_ins_db, gps);
             ControlLinkInData(control, ins_ctl_db);
+            RcsLinkInData(rcs_fc, ins_ctl_db);
 
             /* XXX */
             ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
@@ -87,6 +92,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (0.05, "scheduled") ins.update(0.05);
             P2 (0.05, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (0.05, "scheduled") control.control(0.05);
+            P2 (0.05, "scheduled") rcs_fc.actuate();
+            P2 (0.05, "scheduled") RCS_SaveOutData(rcs_fc, ctl_tvc_db);
             P2 (0.05, "scheduled") Control_SaveOutData(control, ctl_tvc_db);
             P2 (0.05, "scheduled") downlink_packet_transfer(&icf_esps_ctrl);
             ("shutdown") icf_ctrlblk_deinit(&icf_esps_ctrl, ICF_SYSTEM_TYPE_SIL_ESPS);

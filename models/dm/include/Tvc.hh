@@ -42,6 +42,7 @@ class TVC : public Dynamics {
 
   enum TVC_TYPE get_mtvc();
   void set_mtvc(enum TVC_TYPE);
+  void set_S1_TVC();
   void set_S2_TVC();
   void set_S3_TVC();
 

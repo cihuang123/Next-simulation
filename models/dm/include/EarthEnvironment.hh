@@ -69,7 +69,6 @@ class EarthEnvironment : public Dynamics {
   // arma::vec3 get_VAED();
   // arma::mat33 get_TEI();
 
-
  private:
   time_management* time;
 
