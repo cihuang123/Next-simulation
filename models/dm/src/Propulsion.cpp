@@ -233,11 +233,6 @@ void Propulsion::propagate_delta_v(double int_step, double spi,
   this->delta_v += spi * AGRAV * (fuel_flow_rate / vmass) * int_step;
 }
 
-// double Propulsion::calculate_thrust(double press) {
-//   return proptable.look_up("time_vs_thrust", get_rettime(), 0) * AGRAV +
-//          (-press) * this->aexit;
-// }
-
 double Propulsion::calculate_fmassr(enum STAGE stage) {
   return Stage_var_list[stage]->fmass0 - Stage_var_list[stage]->fmasse;
 }
@@ -258,9 +253,6 @@ void Propulsion::load_proptable(const char* filename) {
   proptable = Datadeck(filename);
 }
 
-// void Propulsion::set_StageMass0(double in) { StageMass0 = in; }
-// void Propulsion::set_fmass0(double in) { fmass0 = in; }
-// void Propulsion::set_aexit(double in) { aexit = in; }
 void Propulsion::set_payload_mass(double in) { payload_mass = in; }
 enum Propulsion::THRUST_TYPE Propulsion::get_thrust_state() {
   return this->thrust_state;

@@ -30,6 +30,7 @@ class Control {
   // double control_pitch_rate(double qqdx);
   // double control_gamma(double thtvdcomx);
   void set_close_loop_pole(double in1, double in2);
+  void set_feedforward_gain(double in1);
   void set_thtvdcomx(double in);
   // void set_maut(double in);
   void set_delimx(double in);
@@ -44,7 +45,7 @@ class Control {
   void S2_B_pseudo_G(arma::vec3 cmd, double int_step);
   void S3_B_pseudo_G(arma::vec3 cmd, double int_step);
 
-  void set_aero_coffe(double in1, double in2);
+  void set_aero_coffe(double in1, double in2, double in3);
   void set_IBBB0(double in1, double in2, double in3);
   void set_IBBB1(double in1, double in2, double in3);
   void set_controller_var(double in1, double in2, double in3, double in4,

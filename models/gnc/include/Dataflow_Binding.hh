@@ -32,27 +32,27 @@
     ins.grab_gps_update = GRAB_VAR(dm_ins_db.gps_con_gps_update);        \
   }
 
-#define CONTROL_LINK_decl()                                            \
-  void ControlLinkInData(Control &control,                             \
-                         refactor_ins_to_ctl_t &ins_ctl_db) {          \
-    control.grab_dvbec = GRAB_VAR(ins_ctl_db.ins_dvbec);               \
-    control.grab_thtvdcx = GRAB_VAR(ins_ctl_db.ins_thtvdcx);           \
-    control.grab_thtbdcx = GRAB_VAR(ins_ctl_db.ins_thtbdcx);           \
-    control.grab_phibdcx = GRAB_VAR(ins_ctl_db.ins_phibdcx);           \
-    control.grab_psibdcx = GRAB_VAR(ins_ctl_db.ins_psibdcx);           \
-    control.grab_TBDQ = GRAB_VAR(arma::vec4(ins_ctl_db.ins_TBDQ));     \
-    control.grab_TBD = GRAB_MAT33(ins_ctl_db.ins_TBD);                 \
-    control.grab_alphacx = GRAB_VAR(ins_ctl_db.ins_alphacx);           \
-    control.grab_TBICI = GRAB_MAT33(ins_ctl_db.ins_TBICI);             \
-    control.grab_TBIC = GRAB_MAT33(ins_ctl_db.ins_TBIC);               \
-    control.grab_FSPCB = GRAB_VAR(arma::vec3(ins_ctl_db.accel_FSPCB)); \
-    control.grab_computed_WBIB =                                       \
-        GRAB_VAR(arma::vec3(ins_ctl_db.trick_data.gyro_WBICB));        \
-    control.grab_altc = GRAB_VAR(ins_ctl_db.ins_altc);                 \
-    control.grab_WBECB = LINK(ins, get_WBECB);                         \
-    control.grab_phipcx = GRAB_VAR(ins_ctl_db.ins_phipcx);             \
-    control.grab_alppcx = GRAB_VAR(ins_ctl_db.ins_alppcx);             \
-    control.grab_ABICB = GRAB_VAR(ins_ctl_db.ins_ABICB);               \
+#define CONTROL_LINK_decl()                                                   \
+  void ControlLinkInData(Control &control, refactor_ins_to_ctl_t &ins_ctl_db, \
+                         refactor_uplink_packet_t &dm_ins_db) {               \
+    control.grab_dvbec = GRAB_VAR(ins_ctl_db.ins_dvbec);                      \
+    control.grab_thtvdcx = GRAB_VAR(ins_ctl_db.ins_thtvdcx);                  \
+    control.grab_thtbdcx = GRAB_VAR(ins_ctl_db.ins_thtbdcx);                  \
+    control.grab_phibdcx = GRAB_VAR(ins_ctl_db.ins_phibdcx);                  \
+    control.grab_psibdcx = GRAB_VAR(ins_ctl_db.ins_psibdcx);                  \
+    control.grab_TBDQ = GRAB_VAR(arma::vec4(ins_ctl_db.ins_TBDQ));            \
+    control.grab_TBD = GRAB_MAT33(ins_ctl_db.ins_TBD);                        \
+    control.grab_alphacx = GRAB_VAR(ins_ctl_db.ins_alphacx);                  \
+    control.grab_TBICI = GRAB_MAT33(ins_ctl_db.ins_TBICI);                    \
+    control.grab_TBIC = GRAB_MAT33(ins_ctl_db.ins_TBIC);                      \
+    control.grab_FSPCB = GRAB_VEC3(dm_ins_db.accel_FSPCB);                    \
+    control.grab_computed_WBIB =                                              \
+        GRAB_VAR(arma::vec3(ins_ctl_db.trick_data.gyro_WBICB));               \
+    control.grab_altc = GRAB_VAR(ins_ctl_db.ins_altc);                        \
+    control.grab_WBECB = LINK(ins, get_WBECB);                                \
+    control.grab_phipcx = GRAB_VAR(ins_ctl_db.ins_phipcx);                    \
+    control.grab_alppcx = GRAB_VAR(ins_ctl_db.ins_alppcx);                    \
+    control.grab_ABICB = GRAB_VAR(ins_ctl_db.ins_ABICB);                      \
   }
 
 #define RCS_LINK_decl()                                                   \
@@ -60,6 +60,8 @@
     rcs_fc.grab_WBICB =                                                   \
         GRAB_VAR(arma::vec3(ins_ctl_db.trick_data.gyro_WBICB));           \
     rcs_fc.grab_phibdcx = GRAB_VAR(ins_ctl_db.ins_phibdcx);               \
+    rcs_fc.grab_thtbdcx = GRAB_VAR(ins_ctl_db.ins_thtbdcx);               \
+    rcs_fc.grab_psibdcx = GRAB_VAR(ins_ctl_db.ins_psibdcx);               \
   }
 
 #define INS_SAVE_decl()                                               \

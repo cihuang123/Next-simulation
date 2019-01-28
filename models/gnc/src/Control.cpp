@@ -112,7 +112,7 @@ void Control::control(double int_step) {
       // calculate_xcg_thrust(int_step);
       aerodynamics_der();
       delecx = control_normal_accel(ancomx, int_step);
-      delrcx = control_yaw_accel(alcomx, int_step);
+      // delrcx = control_yaw_accel(alcomx, int_step);
       theta_a_cmd = delecx;
       theta_b_cmd = delrcx;
       break;
@@ -412,10 +412,12 @@ void Control::set_S3_PITCH_DOWN() { maut = S3_PITCH_DOWN; }
 void Control::set_S2_ROLL_CONTROL() { maut = S2_ROLL_CONTROL; }
 void Control::set_NO_CONTROL() { maut = NO_CONTROL; }
 void Control::set_acc_control() { maut = ACC_CONTROL_ON; }
-void Control::set_aero_coffe(double in1, double in2) {
+void Control::set_aero_coffe(double in1, double in2, double in3) {
   refd = in1;
   refa = in2;
+  xcp = in3;
 }
+void Control::set_feedforward_gain(double in1) { gainp = in1; }
 double Control::get_theta_a_cmd() { return theta_a_cmd; }
 double Control::get_theta_b_cmd() { return theta_b_cmd; }
 double Control::get_theta_c_cmd() { return theta_c_cmd; }
@@ -564,7 +566,6 @@ void Control::aerodynamics_der() {
   double cn0(0);
 
   // from other modules
-  double pdynmc(0);
   double vmach(0);
   double dvbec = grab_dvbec();
   double gtvc(1.0);
@@ -770,7 +771,7 @@ double Control::control_normal_accel(double ancomx, double int_step) {
   // input from other modules
   double dvbec = grab_dvbec();
   arma::vec3 WBICB = grab_computed_WBIB();
-  arma::vec3 ABICB = grab_ABICB();
+  arma::vec3 FSPCB = grab_FSPCB();
   //-------------------------------------------------------------------------
   // calculating online close loop poles
   waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
@@ -790,13 +791,13 @@ double Control::control_normal_accel(double ancomx, double int_step) {
   // gainfb1=(zaclp*zaclp*waclp*waclp+2.*zaclp*waclp*paclp+dma+dmq*dla/dvbec-gainfb2*dmde*dla/dvbec)-gainp;
 
   // pitch loop acceleration control, pitch control command
-  double abib3 = ABICB[2];
-  double zzd_new = AGRAV * ancomx + abib3;
+  double fspb3 = FSPCB(2);
+  double zzd_new = AGRAV * ancomx + fspb3;
   zz = integrate(zzd_new, zzd, zz, int_step);
   zzd = zzd_new;
   double dqc =
-      -gainfb1 * (-abib3) - gainfb2 * WBICB(1) + gainfb3 * zz + gainp * zzd;
-  // double delecx = dqc * DEG;
+      -gainfb1 * (-fspb3) - gainfb2 * WBICB(1) + gainfb3 * zz + gainp * zzd;
+  double delecx = dqc * DEG;
 
   // diagnostic output
   GAINFP = arma::vec3({gainfb1, gainfb2, gainfb3});
@@ -833,7 +834,7 @@ double Control::control_yaw_accel(double alcomx, double int_step) {
   // input from other modules
   double dvbec = grab_dvbec();
   arma::vec3 WBICB = grab_computed_WBIB();
-  arma::vec3 ABICB = grab_ABICB();
+  arma::vec3 FSPCB = grab_FSPCB();
 
   //-------------------------------------------------------------------------
   // calculating close loop poles
@@ -849,12 +850,12 @@ double Control::control_yaw_accel(double alcomx, double int_step) {
                    gainy;
 
   // yaw loop acceleration controller, yaw control command
-  double abib2 = ABICB(1);
-  double yyd_new = AGRAV * alcomx - abib2;
+  double fspb2 = FSPCB(1);
+  double yyd_new = AGRAV * alcomx - fspb2;
   yy = integrate(yyd_new, yyd, yy, int_step);
   yyd = yyd_new;
   double drc =
-      -gainfb1 * abib2 - gainfb2 * WBICB(2) + gainfb3 * yy + gainy * yyd;
+      -gainfb1 * fspb2 - gainfb2 * WBICB(2) + gainfb3 * yy + gainy * yyd;
   // double drcx = drc * DEG;
 
   // diagnostic output

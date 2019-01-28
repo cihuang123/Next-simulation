@@ -51,7 +51,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         void link(){
             GPSLinkInData(gps, dm_ins_db, ins);
             INSLinkInData(ins, dm_ins_db, gps);
-            ControlLinkInData(control, ins_ctl_db);
+            ControlLinkInData(control, ins_ctl_db, dm_ins_db);
             RcsLinkInData(rcs_fc, ins_ctl_db);
 
             /* XXX */

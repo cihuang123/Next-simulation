@@ -49,7 +49,7 @@ void RCS_FC::disable_rcs() { rcs_type = NO_RCS; }
 
 bool RCS_FC::isEnabled() { return rcs_type > 0; }
 
-void RCS_FC::set_mode(enum RCS_FC::RCS_MODE in) { rcs_mode = in; }
+void RCS_FC::set_mode(int in) { rcs_mode = static_cast<RCS_MODE>(in); }
 
 ///////////////////////////////////////////////////////////////////////////////
 // RCS_FC thruster module
@@ -79,8 +79,8 @@ void RCS_FC::actuate() {
   double alphacx = 0.0;
   double betacx = 0.0;
 
-  double thtbdcx = 0.0;
-  double psibdcx = 0.0;
+  double thtbdcx = grab_thtbdcx();
+  double psibdcx = grab_psibdcx();
   double phibdcx = grab_phibdcx();
 
   if (this->rcs_type == NO_RCS) return;

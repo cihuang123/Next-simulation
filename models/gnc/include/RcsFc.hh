@@ -37,7 +37,7 @@ class RCS_FC {
 
   bool isEnabled();
 
-  void set_mode(enum RCS_MODE);
+  void set_mode(int in);
   enum RCS_MODE get_rcs_mode();
 
   std::function<arma::vec3()> grab_UTBC;

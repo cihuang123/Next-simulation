@@ -78,6 +78,8 @@ class Rocket_SimObject : public Trick::SimObject {
             tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
 
             rcs.grab_e_roll            = GRAB_VAR(ctl_tvc_db.e_roll);
+            rcs.grab_e_pitch            = GRAB_VAR(ctl_tvc_db.e_pitch);
+            rcs.grab_e_yaw            = GRAB_VAR(ctl_tvc_db.e_yaw);
         };
 
         void egse_uplink_packet_transfer(struct icf_ctrlblk_t *C) {
@@ -111,7 +113,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gyro->init();
             ("initialization") accelerometer->init();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
-            ("initialization") nxbus_init();
+            // ("initialization") nxbus_init();
 
             P1 (int_step, "scheduled") time->dm_time(int_step);
 	        P1 (int_step, "scheduled") env.algorithm(int_step);
@@ -131,7 +133,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
-            ("shutdown") nxbus_deinit();
+            // ("shutdown") nxbus_deinit();
         }
 };
 

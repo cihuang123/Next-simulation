@@ -269,6 +269,39 @@ void RCS_Thruster::calculate_Q(double input, arma::mat33 TBI,
              -trans(TBI) * cross_matrix(RHO) * RCS_BETA_6);
 }
 
+void RCS_Thruster::calculate_Torque_Q(double input, arma::mat33 TBI,
+                                      enum EngType type_in) {
+  arma::vec3 Thrust_torque;
+
+  switch (type_in) {
+    case X:
+      Thrust_torque(0) = Roll_mom_max;
+      Thrust_torque(1) = 0.0;
+      Thrust_torque(2) = 0.0;
+      break;
+
+    case Y:
+      Thrust_torque(0) = 0.0;
+      Thrust_torque(1) = Pitch_mom_max;
+      Thrust_torque(2) = 0.0;
+      break;
+
+    case Z:
+      Thrust_torque(0) = 0.0;
+      Thrust_torque(1) = 0.0;
+      Thrust_torque(2) = Yaw_mom_max;
+      break;
+  }
+  Thrust_torque = Schmitt_trigger(input) * Thrust_torque;
+
+  Q(0) = 0.0;
+  Q(1) = 0.0;
+  Q(2) = 0.0;
+  Q(3) = dot(Thrust_torque, RCS_BETA_4);
+  Q(4) = dot(Thrust_torque, RCS_BETA_5);
+  Q(5) = dot(Thrust_torque, RCS_BETA_6);
+}
+
 int RCS_Thruster::Schmitt_trigger(double in) {
   // local variable
   int output(0);
@@ -298,15 +331,22 @@ void RCS_Thruster::clear() {
   return;
 }
 
-void RCS_Thruster::set_thruster_var(double in1, double in2, double in3, int in4) {
+void RCS_Thruster::set_thruster_var(double in1, double in2, double in3,
+                                    int in4) {
   dead_zone = in1;
   hysteresis = in2;
   thrust = in3;
-  mode = static_cast<EngType> (in4);
+  mode = static_cast<EngType>(in4);
 }
 
 void RCS_Thruster::set_RHO(double in1, double in2, double in3) {
   RHO(0) = in1;
   RHO(1) = in2;
   RHO(2) = in3;
+}
+
+void RCS_Thruster::set_mom_max(double in1, double in2, double in3) {
+  Roll_mom_max = in1;
+  Pitch_mom_max = in2;
+  Yaw_mom_max = in3;
 }

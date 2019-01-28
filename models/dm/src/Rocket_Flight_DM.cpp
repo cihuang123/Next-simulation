@@ -1,6 +1,6 @@
-#include "Rocket_Flight_DM.hh"
 #include <iomanip>
 #include <tuple>
+#include "Rocket_Flight_DM.hh"
 #include "aux.hh"
 #include "cad_utility.hh"
 #include "integrate.hh"
@@ -679,8 +679,8 @@ void Rocket_Flight_DM::propagate_aeroloss(double int_step) {
   double vmass;
   data_exchang->hget("vmass", &vmass);
   // calculate aero loss
-  FAPB = FAPB * (1. / vmass);
-  _aero_loss = _aero_loss + norm(FAPB) * int_step;
+  arma::vec3 tmp = FAPB * (1. / vmass);
+  _aero_loss = _aero_loss + norm(tmp) * int_step;
 }
 
 void Rocket_Flight_DM::propagate_control_loss(double int_step) {
@@ -801,7 +801,7 @@ double Rocket_Flight_DM::get_thtbdx_in(double &cthtbd) {
     cthtbd = cos(thtbd);
   } else {
     thtbd = PI / 2 * sign(-TBD(0, 2));
-    cthtbd = arma::datum::eps;
+    cthtbd = 1e-10;
   }
   // thtbd = asin(  2 * (TBDQ(0) * TBDQ(2) - TBDQ(1) * TBDQ(3)));
 
