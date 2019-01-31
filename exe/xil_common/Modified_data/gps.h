@@ -8,7 +8,7 @@
 extern "C" void record_gps() {
     Trick::DRAscii *drg = new Trick::DRAscii("ngps");
     drg->set_freq(Trick::DR_Always);
-    drg->set_cycle(0.05);
+    drg->set_cycle(0.005);
     drg->set_single_prec_only(false);
     // drg->add_variable("rkt.dynamics._SBEE[0]");
     // drg->add_variable("rkt.dynamics._SBEE[1]");

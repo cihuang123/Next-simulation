@@ -305,7 +305,7 @@ void RCS_Thruster::calculate_Torque_Q(double input, arma::mat33 TBI,
 int RCS_Thruster::Schmitt_trigger(double in) {
   // local variable
   int output(0);
-
+  if (in == saved_value) return 0;
   // saved_value signal 'trend' (=1 increasing, =-1 decreasing)
   // saved_value signal 'side' (=-1 left, =1 right)
   int trend = sign(in - saved_value);

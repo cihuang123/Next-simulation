@@ -387,7 +387,7 @@ void Rocket_Flight_DM::init() {
   data_exchang->hget("XCG_0", XCG);
   build_WEII();
 
-  rhoC_1(0) = -XCG(0) - (-8.436);
+  rhoC_1(0) = -XCG(0) - reference_point;
   rhoC_1(1) = 0.0;
   rhoC_1(2) = 0.0;
 
@@ -521,11 +521,11 @@ void Rocket_Flight_DM::algorithm(double int_step) {
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
 
   arma::vec3 rhoC_IMU;
-  arma::vec3 XCG_0;
+  arma::vec3 XCG;
 
-  data_exchang->hget("XCG_0", XCG_0);
+  data_exchang->hget("XCG", XCG);
 
-  rhoC_IMU(0) = -XCG_0(0) - (reference_point);
+  rhoC_IMU(0) = -XCG(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
 

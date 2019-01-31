@@ -130,7 +130,7 @@ extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
     rkt->dynamics.set_DOF(6);
     // rkt->forces.set_damping_ratio(0.005);
     // rkt->forces.set_TWD_flag(0);
-    rkt->dynamics.set_aero_flag(0);
+    rkt->dynamics.set_aero_flag(1);
     rkt->dynamics.set_liftoff(0);  // 1 only for test
 }
 
@@ -278,11 +278,11 @@ extern "C" void master_init_rcs(Rocket_SimObject *rkt) {
 
     // Thruster 2
     rkt->rcs.Thruster_list[1]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 1);
-    rkt->rcs.Thruster_list[1]->set_mom_max(0.0, 200000.0, 0.0);
+    rkt->rcs.Thruster_list[1]->set_mom_max(0.0, 350000.0, 0.0);
 
     // Thruster 3
     rkt->rcs.Thruster_list[2]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 2);
-    rkt->rcs.Thruster_list[2]->set_mom_max(0.0, 0.0, 200000.0);
+    rkt->rcs.Thruster_list[2]->set_mom_max(0.0, 0.0, 350000.0);
 }
 
 extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
