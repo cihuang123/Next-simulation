@@ -101,6 +101,7 @@ Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
       VECTOR_INIT(beta_b1_q5, 3),
       VECTOR_INIT(beta_b1_q6, 3) {
   data_exchang = &input;
+  reference_point_flag = 0;
 }
 
 Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
@@ -386,7 +387,7 @@ void Rocket_Flight_DM::init() {
   arma::vec3 XCG;
   data_exchang->hget("XCG_0", XCG);
   build_WEII();
-
+  reference_point_calc();
   rhoC_1(0) = -XCG(0) - reference_point;
   rhoC_1(1) = 0.0;
   rhoC_1(2) = 0.0;
@@ -497,11 +498,23 @@ arma::vec Rocket_Flight_DM::build_VBEB(double _alpha0x, double _beta0x,
 
 void Rocket_Flight_DM::set_reference_point(double rp) { reference_point = rp; }
 
+void Rocket_Flight_DM::set_reference_point_eq_xcg() {
+  reference_point_flag = 1;
+}
+
+void Rocket_Flight_DM::reference_point_calc() {
+  if (reference_point_flag == 0) return;
+  arma::vec3 XCG;
+  data_exchang->hget("XCG", XCG);
+  reference_point = -XCG(0);
+}
+
 void Rocket_Flight_DM::algorithm(double int_step) {
   arma::vec3 VAED;
   arma::mat33 TEI;
   data_exchang->hget("TEI", TEI);
   data_exchang->hget("VAED", VAED);
+  reference_point_calc();
 
   std::vector<arma::vec> V_State_In;
   std::vector<arma::vec> V_State_Out(4);
@@ -582,6 +595,7 @@ void Rocket_Flight_DM::Send() {
   data_exchang->hset("SBII", SBII);
   data_exchang->hset("dvbe", _dvbe);
   data_exchang->hset("WBIBD", WBIBD);
+  data_exchang->hset("reference_point", reference_point);
 }
 
 void Rocket_Flight_DM::propagate_TBI(double int_step, arma::vec3 WBIB_in) {
@@ -930,12 +944,12 @@ void Rocket_Flight_DM::RK4F(std::vector<arma::vec> Var_in,
 
   collect_forces_and_propagate();
 
-  arma::vec3 XCG_0;
+  arma::vec3 XCG;
 
-  data_exchang->hget("XCG_0", XCG_0);
+  data_exchang->hget("XCG", XCG);
   WBIBD = ddang_1;
 
-  rhoC_IMU(0) = -XCG_0(0) - (reference_point);
+  rhoC_IMU(0) = -XCG(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
   arma::vec3 ddrhoC_IMU =

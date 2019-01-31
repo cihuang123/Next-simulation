@@ -76,8 +76,10 @@ void TVC::algorithm(double int_step) {
   // theta_d_cmd = grab_theta_d_cmd();
   double thrust;
   arma::mat33 TBI;
+  arma::vec3 XCG;
   data_exchang->hget("TBI", TBI);
   data_exchang->hget("thrust", &thrust);
+  data_exchang->hget("XCG", XCG);
   switch (mtvc) {
     case NO_TVC:
       // return if no tvc
@@ -92,7 +94,7 @@ void TVC::algorithm(double int_step) {
 
       S1_Eng_list[0]->calculate_Q(S1_Eng_list[0]->Act_list[0]->ActOuptut,
                                   S1_Eng_list[0]->Act_list[1]->ActOuptut,
-                                  thrust, TBI, S1_Eng_list[0]->type);
+                                  thrust, TBI, -XCG(0), S1_Eng_list[0]->type);
       ActOutput1 = S1_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S1_Eng_list[0]->Act_list[1]->ActOuptut;
 
@@ -109,7 +111,7 @@ void TVC::algorithm(double int_step) {
 
       S2_Eng_list[0]->calculate_Q(S2_Eng_list[0]->Act_list[0]->ActOuptut,
                                   S2_Eng_list[0]->Act_list[1]->ActOuptut,
-                                  thrust, TBI, S2_Eng_list[0]->type);
+                                  thrust, TBI, -XCG(0), S2_Eng_list[0]->type);
       ActOutput1 = S2_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S2_Eng_list[0]->Act_list[1]->ActOuptut;
 
@@ -126,7 +128,7 @@ void TVC::algorithm(double int_step) {
 
       S3_Eng_list[0]->calculate_Q(S3_Eng_list[0]->Act_list[0]->ActOuptut,
                                   S3_Eng_list[0]->Act_list[1]->ActOuptut,
-                                  thrust, TBI, S3_Eng_list[0]->type);
+                                  thrust, TBI, -XCG(0), S3_Eng_list[0]->type);
 
       ActOutput1 = S3_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S3_Eng_list[0]->Act_list[1]->ActOuptut;

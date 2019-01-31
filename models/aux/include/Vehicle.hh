@@ -1,12 +1,12 @@
 #ifndef Vehicle_list__HH
 #define Vehicle_list__HH
 #include <armadillo>
+#include <cstdio>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include <vector>
 #include "aux.hh"
-#include <cstdlib>
-#include <cstdio>
 /********************************* TRICK HEADER *******************************
 PURPOSE:
       (Simulation module abstraction class and vehicle class)
@@ -29,7 +29,7 @@ class Data_exchang {
     if (int_table.find(input) == int_table.end()) {
       std::cerr << "Can not find " << input << " in int_table." << std::endl;
       std::abort();
-    } 
+    }
     *val = int_table.find(input)->second;
   }
   void hget(std::string input, double *val) {
@@ -68,9 +68,9 @@ class FH_module {
 
   virtual void algorithm(double int_step) = 0;
   virtual void init() = 0;
-  
-  protected :
-    Data_exchang *data_exchang;
+
+ protected:
+  Data_exchang *data_exchang;
 };
 
 // class Vehicle {

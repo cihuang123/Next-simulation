@@ -8,7 +8,7 @@ const double LONX           = -120.49;  //  Vehicle longitude - deg  module newt
 const double LATX           = 34.68;   //  Vehicle latitude  - deg  module newton
 const double ALT            = 100.0;         //  Vehicle altitude  - m  module newton
 const double PHIBDX         = 0.0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
-const double THTBDX         = 89.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
+const double THTBDX         = 90.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
 const double PSIBDX         = -83.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
 const double ALPHA0X        = 0;    // Initial angle-of-attack   - deg  module newton
 const double BETA0X         = 0;    // Initial sideslip angle    - deg  module newton
@@ -18,6 +18,7 @@ const double RCS_DEADZONE   = 0.1;   //  Dead zone of Schmitt trigger
 const double RCS_HYSTERESIS = 0.4;   //  Hysteresis of Schmitt trigger
 const double RCS_THRUST     = 5.0;   //  RCS thrust
 const double RCS_D          = 1.016;   
+const unsigned int CYCLE    = 2;
 /* S1 */
 const double S1_XCG_0          = 10.53;    //  vehicle initial xcg
 const double S1_XCG_1          = 6.76;     //  vehicle final xcg
@@ -187,7 +188,8 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_stage_var(S1_SPI, S1_fmass0, S1_vmass0, 0.0, S1_FUEL_FLOW_RATE, S1_XCG_0, S1_XCG_1,
                                      S1_MOI_ROLL_0, S1_MOI_ROLL_1, S1_MOI_PITCH_0, S1_MOI_PITCH_1, S1_MOI_YAW_0, S1_MOI_YAW_1, 
                                      0);
-    rkt->dynamics.set_reference_point(S1_RP);
+    // rkt->dynamics.set_reference_point(S1_RP);
+    rkt->dynamics.set_reference_point_eq_xcg();
     rkt->propulsion.set_stage_1();
     rkt->propulsion.set_no_thrust();
 }
@@ -211,7 +213,7 @@ extern "C" void master_init_sensors(Rocket_SimObject *rkt) {
     rkt->gyro = new GyroIdeal(rkt->data_exchang);
 
     // rkt->sdt = new SDT_NONIDEAL();
-    rkt->sdt = new SDT_ideal(rkt->data_exchang);
+    rkt->sdt = new SDT_ideal(rkt->data_exchang, CYCLE);
 }
 
 extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
@@ -221,19 +223,19 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     rkt->tvc.Allocate_ENG(1, rkt->tvc.S3_Eng_list);
     
     // Allocate S1 Engine position
-    rkt->tvc.S1_Eng_list[0]->set_ENG_HINGE_POS(0.0, 0.0, 0.0);
+    rkt->tvc.S1_Eng_list[0]->set_ENG_HINGE_POS(S1_RP, 0.0, 0.0);
 
     // Allocate S1 Engine gimbal direction
     rkt->tvc.S1_Eng_list[0]->set_ENG_Dir(3);
 
     // Allocate S2 Engine position
-    rkt->tvc.S2_Eng_list[0]->set_ENG_HINGE_POS(0.0, 0.0, 0.0);
+    rkt->tvc.S2_Eng_list[0]->set_ENG_HINGE_POS(S2_RP, 0.0, 0.0);
 
     // Allocate S2 Engine gimbal direction
     rkt->tvc.S2_Eng_list[0]->set_ENG_Dir(3);
 
     // Allocate S3 Engine position
-    rkt->tvc.S3_Eng_list[0]->set_ENG_HINGE_POS(0.0, 0.0, 0.0);
+    rkt->tvc.S3_Eng_list[0]->set_ENG_HINGE_POS(S3_RP, 0.0, 0.0);
 
     // Allocate S3 Engine gimbal direction
     rkt->tvc.S3_Eng_list[0]->set_ENG_Dir(3);
@@ -278,11 +280,11 @@ extern "C" void master_init_rcs(Rocket_SimObject *rkt) {
 
     // Thruster 2
     rkt->rcs.Thruster_list[1]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 1);
-    rkt->rcs.Thruster_list[1]->set_mom_max(0.0, 350000.0, 0.0);
+    rkt->rcs.Thruster_list[1]->set_mom_max(0.0, 200000.0, 0.0);
 
     // Thruster 3
     rkt->rcs.Thruster_list[2]->set_thruster_var(RCS_DEADZONE, RCS_HYSTERESIS, RCS_THRUST, 2);
-    rkt->rcs.Thruster_list[2]->set_mom_max(0.0, 0.0, 350000.0);
+    rkt->rcs.Thruster_list[2]->set_mom_max(0.0, 0.0, 200000.0);
 }
 
 extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {

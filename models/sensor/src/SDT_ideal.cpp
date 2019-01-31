@@ -8,7 +8,7 @@
 #include "matrix/utility.hh"
 #include "sdt/SDT_IDEAL.hh"
 
-SDT_ideal::SDT_ideal(Data_exchang &input)
+SDT_ideal::SDT_ideal(Data_exchang &input, unsigned int kl_in)
     : VECTOR_INIT(WBISB, 3),
       VECTOR_INIT(WBISB_old, 3),
       VECTOR_INIT(DELTA_ALPHA, 3),
@@ -16,6 +16,7 @@ SDT_ideal::SDT_ideal(Data_exchang &input)
       VECTOR_INIT(FSPSB, 3),
       VECTOR_INIT(FSPSB_old, 3) {
   data_exchang = &input;
+  k_limit = kl_in;
 }
 
 SDT_ideal::SDT_ideal(const SDT_ideal &other) {
@@ -53,7 +54,7 @@ void SDT_ideal::init() {
 void SDT_ideal::algorithm(double int_step) {
   data_exchang->hget("WBICB", WBISB);
   data_exchang->hget("FSPCB", FSPSB);
-  if (k == 11 || k == 1) {
+  if (k == k_limit || k == 1) {
     k = 1;
     PHI.zeros();
     ALPHA.zeros();

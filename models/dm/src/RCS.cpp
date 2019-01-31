@@ -18,9 +18,9 @@ void RCS::algorithm(double int_step) {
 
   Q_RCS.zeros();
 
-  Thruster_list[0]->calculate_Torque_Q(0.0, TBI, Thruster_list[0]->mode);
+  Thruster_list[0]->calculate_Torque_Q(e_roll, TBI, Thruster_list[0]->mode);
   Thruster_list[1]->calculate_Torque_Q(e_pitch, TBI, Thruster_list[1]->mode);
-  Thruster_list[2]->calculate_Torque_Q(0.0, TBI, Thruster_list[2]->mode);
+  Thruster_list[2]->calculate_Torque_Q(e_yaw, TBI, Thruster_list[2]->mode);
 
   for (unsigned int i = 0; i < Thruster_list.size(); i++) {
     Q_RCS += Thruster_list[i]->Q;

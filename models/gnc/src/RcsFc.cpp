@@ -72,9 +72,9 @@ void RCS_FC::actuate() {
   double alphacomx = 0.0;
   double betacomx = 0.0;
 
-  double qqcx = WBICB(1);
-  double ppcx = WBICB(0);
-  double rrcx = WBICB(2);
+  double qqcx = WBICB(1) * DEG;
+  double ppcx = WBICB(0) * DEG;
+  double rrcx = WBICB(2) * DEG;
 
   double alphacx = 0.0;
   double betacx = 0.0;

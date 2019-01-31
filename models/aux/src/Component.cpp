@@ -89,10 +89,18 @@ void ENG::Allocate_Actuator(int NumAct, enum ActDynType TYPE) {
 }
 
 void ENG::calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
-                      enum EngType TYPE) {
+                      double rp_in, enum EngType TYPE) {
   THRUST(0) = thrust_in;
   THRUST(1) = 0.0;
   THRUST(2) = 0.0;
+
+  arma::vec3 rho_en_1;
+
+  rho_en_1(0) = rp_in;
+  rho_en_1(1) = 0.0;
+  rho_en_1(2) = 0.0;
+
+  rho_en_1 = rho_en_1 - ENG_HINGE_POS;
 
   switch (TYPE) {
     case X:
@@ -127,18 +135,26 @@ void ENG::calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
   Q(1) = dot(trans(TBI) * trans(T_N_B) * THRUST, ENG_GAMMA_2);
   Q(2) = dot(trans(TBI) * trans(T_N_B) * THRUST, ENG_GAMMA_3);
   Q(3) = dot(trans(TBI) * trans(T_N_B) * THRUST,
-             -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_4);
+             -trans(TBI) * cross_matrix(rho_en_1) * ENG_BETA_4);
   Q(4) = dot(trans(TBI) * trans(T_N_B) * THRUST,
-             -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_5);
+             -trans(TBI) * cross_matrix(rho_en_1) * ENG_BETA_5);
   Q(5) = dot(trans(TBI) * trans(T_N_B) * THRUST,
-             -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_6);
+             -trans(TBI) * cross_matrix(rho_en_1) * ENG_BETA_6);
 }
 
 void ENG::calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
-                      arma::mat33 TBI, enum EngType TYPE) {
+                      arma::mat33 TBI, double rp_in, enum EngType TYPE) {
   THRUST(0) = thrust_in;
   THRUST(1) = 0.0;
   THRUST(2) = 0.0;
+
+  arma::vec3 rho_en_1;
+
+  rho_en_1(0) = rp_in;
+  rho_en_1(1) = 0.0;
+  rho_en_1(2) = 0.0;
+
+  rho_en_1 = rho_en_1 - ENG_HINGE_POS;
 
   switch (TYPE) {
     case YZ:
@@ -159,11 +175,11 @@ void ENG::calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
   Q(1) = dot(trans(TBI) * trans(T_N_B) * THRUST, ENG_GAMMA_2);
   Q(2) = dot(trans(TBI) * trans(T_N_B) * THRUST, ENG_GAMMA_3);
   Q(3) = dot(trans(TBI) * trans(T_N_B) * THRUST,
-             -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_4);
+             -trans(TBI) * cross_matrix(rho_en_1) * ENG_BETA_4);
   Q(4) = dot(trans(TBI) * trans(T_N_B) * THRUST,
-             -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_5);
+             -trans(TBI) * cross_matrix(rho_en_1) * ENG_BETA_5);
   Q(5) = dot(trans(TBI) * trans(T_N_B) * THRUST,
-             -trans(TBI) * cross_matrix(ENG_HINGE_POS) * ENG_BETA_6);
+             -trans(TBI) * cross_matrix(rho_en_1) * ENG_BETA_6);
 }
 
 RCS_Thruster::RCS_Thruster()

@@ -8,9 +8,7 @@ class SDT : public Sensor {
   TRICK_INTERFACE(SDT);
 
  public:
-  SDT()
-      : VECTOR_INIT(PHI, 3),
-        VECTOR_INIT(DELTA_VEL, 3) {};
+  SDT() : VECTOR_INIT(PHI, 3), VECTOR_INIT(DELTA_VEL, 3){};
   virtual ~SDT(){};
 
   virtual void init() = 0;
@@ -29,10 +27,12 @@ class SDT : public Sensor {
   virtual int write_to_(const char *bus_name) { return 0; }
 
  protected:
-
   VECTOR(PHI, 3); /* *o (r)       PHI = DELTA_ALPHA + 0.5 * DELTA_BETA */
 
   VECTOR(DELTA_VEL, 3); /* *o (m/s)     Delta V */
+
+  unsigned int k;       /* *o (--)       calculate index */
+  unsigned int k_limit; /* *o (--) sdt cycle limit */
 };
 
 #endif

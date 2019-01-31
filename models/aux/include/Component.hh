@@ -65,9 +65,9 @@ class ENG {
 
   /* Function declaration */
   void calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
-                   enum EngType TYPE);
+                   double rp_in, enum EngType TYPE);
   void calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
-                   arma::mat33 TBI, enum EngType TYPE);
+                   arma::mat33 TBI, double rp_in, enum EngType TYPE);
   void Allocate_Actuator(int NumAct, enum ActDynType TYPE);
   void set_ENG_HINGE_POS(double x, double y, double z);
   void set_ENG_Dir(int type_in);
