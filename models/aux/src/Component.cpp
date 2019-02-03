@@ -42,6 +42,10 @@ void ACT_1st::set_1st_act_var(double Ang_limit_in, double Ang_rate_limit_in,
   Tau = Tau_in;
 }
 
+void ACT_NO_DYN::Actuate(double input_command, double int_step) {
+  ActOuptut = input_command;
+}
+
 ENG::ENG()
     : VECTOR_INIT(Q, 6),
       MATRIX_INIT(T_N_B, 3, 3),
@@ -75,14 +79,24 @@ void ENG::set_ENG_HINGE_POS(double x, double y, double z) {
 void ENG::set_ENG_Dir(int type_in) { type = static_cast<EngType>(type_in); }
 
 void ENG::Allocate_Actuator(int NumAct, enum ActDynType TYPE) {
+  ACT** act_list = new ACT*[NumAct];
   switch (TYPE) {
-    case FIRST: {
-      ACT_1st** act_list = new ACT_1st*[NumAct];
+    case FIRST:
       for (int i = 0; i < NumAct; i++) {
-        act_list[i] = new ACT_1st;
+        ACT_1st* ACT_1st_ptr = new ACT_1st;
+        act_list[i] = dynamic_cast<ACT*>(ACT_1st_ptr);
         Act_list.push_back(act_list[i]);
       }
-    } break;
+      break;
+
+    case NO_DYN:
+      for (int i = 0; i < NumAct; i++) {
+        ACT_NO_DYN* ACT_NO_DYN_ptr = new ACT_NO_DYN;
+        act_list[i] = dynamic_cast<ACT*>(ACT_NO_DYN_ptr);
+        Act_list.push_back(act_list[i]);
+      }
+      break;
+
     default:
       break;
   }

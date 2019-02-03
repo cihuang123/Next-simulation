@@ -35,9 +35,9 @@ const double S1_RP             = -16.84;      //  reference point
 const double S1_ROLL_CMD       = 0.0;       //  Roll command - deg
 const double S1_PITCH_CMD      = 80.0;
 const double S1_YAW_CMD        = -83.0;
-const double S1_ANCOMX         = 0.0;
+const double S1_ANCOMX         = -0.15;
 const double S1_ALCOMX         = 0.0;
-const double S1_GAINP          = 10.0;
+const double S1_GAINP          = 0.0;
 /* S2 */
 const double S2_XCG_0          = 6.1736;    //  vehicle initial xcg
 const double S2_XCG_1          = 5.914;     //  vehicle final xcg
@@ -75,8 +75,8 @@ const double S3_RP             = 3.86;
 /* Controller setting */
 const double ZACLP             = 1.0;   // Damping of accel close loop complex pole - ND
 const double ZACLY             = 1.0;   // Damping of accel close loop complex pole - ND
-const double FACTWACLP         = 0.0;   // Factor to mod 'waclp': waclp*(1+factwacl) - ND
-const double FACTWACLY         = 0.0;   // Factor to mod 'wacly': wacly*(1+factwacl) - ND
+const double FACTWACLP         = 0.5;   // Factor to mod 'waclp': waclp*(1+factwacl) - ND
+const double FACTWACLY         = 0.5;   // Factor to mod 'wacly': wacly*(1+factwacl) - ND
 const double ALPHACOMX         = 0.0;   // AOA command - deg
 const double BETACOMX          = 0.0;   // Side slip angle command - deg
 const double ROLLCOMX          = 0.0;   // Roll angle command - deg
@@ -308,7 +308,7 @@ extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
 extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc) {
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
-    // jit_add_read(4.001 + fc->stand_still_time, "event_acc_on");
+    // jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
     // jit_add_read(0.001 + fc->stand_still_time, "event_s2_control_on");
 
     exec_set_terminate_time(10.001 + fc->stand_still_time);

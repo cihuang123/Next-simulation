@@ -241,7 +241,7 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     rkt->tvc.S3_Eng_list[0]->set_ENG_Dir(3);
 
     // Allocate S1 Actuator
-    for (int i = 0; i < rkt->tvc.S1_Eng_list.size(); i++) rkt->tvc.S1_Eng_list[i]->Allocate_Actuator(2, FIRST);
+    for (int i = 0; i < rkt->tvc.S1_Eng_list.size(); i++) rkt->tvc.S1_Eng_list[i]->Allocate_Actuator(2, NO_DYN);
 
     // Allocate S1 Actuator variables
     for (int i = 0; i < rkt->tvc.S1_Eng_list.size(); i++) {
@@ -251,24 +251,24 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     }
     
     // Allocate S2 Actuator
-    for (int i = 0; i < rkt->tvc.S2_Eng_list.size(); i++) rkt->tvc.S2_Eng_list[i]->Allocate_Actuator(2, FIRST);
+    for (int i = 0; i < rkt->tvc.S2_Eng_list.size(); i++) rkt->tvc.S2_Eng_list[i]->Allocate_Actuator(2, NO_DYN);
 
     // Allocate S2 Actuator variables
-    for (int i = 0; i < rkt->tvc.S2_Eng_list.size(); i++) {
-        for (int j = 0; j < rkt->tvc.S2_Eng_list[i]->Act_list.size(); j++) {
-            rkt->tvc.S2_Eng_list[i]->Act_list[j]->set_1st_act_var(7.0 * RAD, 16.0 * RAD, 360.0 * RAD, 20.0);
-        }
-    }
+    // for (int i = 0; i < rkt->tvc.S2_Eng_list.size(); i++) {
+    //     for (int j = 0; j < rkt->tvc.S2_Eng_list[i]->Act_list.size(); j++) {
+    //         rkt->tvc.S2_Eng_list[i]->Act_list[j]->set_1st_act_var(7.0 * RAD, 16.0 * RAD, 360.0 * RAD, 20.0);
+    //     }
+    // }
 
     // Allocate S3 Actuator
-    for (int i = 0; i < rkt->tvc.S3_Eng_list.size(); i++) rkt->tvc.S3_Eng_list[i]->Allocate_Actuator(2, FIRST);
+    for (int i = 0; i < rkt->tvc.S3_Eng_list.size(); i++) rkt->tvc.S3_Eng_list[i]->Allocate_Actuator(2, NO_DYN);
 
     // Allocate S3 Actuator variables
-    for (int i = 0; i < rkt->tvc.S3_Eng_list.size(); i++) {
-        for (int j = 0; j < rkt->tvc.S3_Eng_list[i]->Act_list.size(); j++) {
-            rkt->tvc.S3_Eng_list[i]->Act_list[j]->set_1st_act_var(7.0 * RAD, 16.0 * RAD, 360.0 * RAD, 20.0);
-        }
-    }
+    // for (int i = 0; i < rkt->tvc.S3_Eng_list.size(); i++) {
+    //     for (int j = 0; j < rkt->tvc.S3_Eng_list[i]->Act_list.size(); j++) {
+    //         rkt->tvc.S3_Eng_list[i]->Act_list[j]->set_1st_act_var(7.0 * RAD, 16.0 * RAD, 360.0 * RAD, 20.0);
+    //     }
+    // }
 }
 
 extern "C" void master_init_rcs(Rocket_SimObject *rkt) {

@@ -12,7 +12,7 @@ LIBRARY DEPENDENCY:
 *******************************************************************************/
 enum EngType { X = 0, Y, Z, YZ };
 
-enum ActDynType { FIRST = 0 };
+enum ActDynType { FIRST = 0, NO_DYN };
 
 class ACT {
  public:
@@ -37,8 +37,8 @@ class ACT_1st : public ACT {
   ~ACT_1st(){};
 
   virtual void Actuate(double input_command, double int_step);
-  void set_1st_act_var(double Ang_limit_in, double Ang_rate_limit_in,
-                       double Ang_acc_limit_in, double Tau_in);
+  virtual void set_1st_act_var(double Ang_limit_in, double Ang_rate_limit_in,
+                               double Ang_acc_limit_in, double Tau_in);
 
  protected:
   /* Variables declaration */
@@ -48,6 +48,18 @@ class ACT_1st : public ACT {
   double Tau;            /* *o (--) Actuator's time constant */
   double Act_prior_state; /* *o (r) Actuator's prior state */
   double Act_prior_rate;  /* *o (r/s) Actuator's proir angular rate */
+};
+
+class ACT_NO_DYN : public ACT {
+  TRICK_INTERFACE(ACT_NO_DYN);
+
+ public:
+  ACT_NO_DYN(){};
+  ~ACT_NO_DYN(){};
+
+  virtual void Actuate(double input_command, double int_step);
+  virtual void set_1st_act_var(double Ang_limit_in, double Ang_rate_limit_in,
+                               double Ang_acc_limit_in, double Tau_in){};
 };
 
 class ENG {
