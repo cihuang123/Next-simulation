@@ -46,7 +46,7 @@ void IntegratorRK4(std::vector<arma::vec> V_in, std::vector<arma::vec> &V_out,
                    T *ClassPointer, double int_step) {
   {
     std::vector<std::vector<arma::vec>> KMAT;
-    for (int i = 0; i < V_in.size(); i++) {
+    for (unsigned int i = 0; i < V_in.size(); i++) {
       std::vector<arma::vec> KROW(4);
       KMAT.push_back(KROW);
     }
@@ -55,28 +55,47 @@ void IntegratorRK4(std::vector<arma::vec> V_in, std::vector<arma::vec> &V_out,
 
     ((ClassPointer)->*fp)(V_out, KMAT[0]);
 
-    for (int i = 0; i < V_in.size(); i++) {
+    for (unsigned int i = 0; i < V_in.size(); i++) {
       V_out[i] = V_in[i] + KMAT[0][i] * 0.5 * int_step;
     }
 
     ((ClassPointer)->*fp)(V_out, KMAT[1]);
 
-    for (int i = 0; i < V_in.size(); i++) {
+    for (unsigned int i = 0; i < V_in.size(); i++) {
       V_out[i] = V_in[i] + KMAT[1][i] * 0.5 * int_step;
     }
 
     ((ClassPointer)->*fp)(V_out, KMAT[2]);
 
-    for (int i = 0; i < V_in.size(); i++) {
+    for (unsigned int i = 0; i < V_in.size(); i++) {
       V_out[i] = V_in[i] + KMAT[2][i] * int_step;
     }
 
     ((ClassPointer)->*fp)(V_out, KMAT[3]);
 
-    for (int i = 0; i < V_in.size(); i++) {
+    for (unsigned int i = 0; i < V_in.size(); i++) {
       V_out[i] = V_in[i] + (int_step / 6.0) * (KMAT[0][i] + 2.0 * KMAT[1][i] +
                                                2.0 * KMAT[2][i] + KMAT[3][i]);
     }
+  }
+}
+
+template <typename T>
+void IntegratorEuler(std::vector<arma::vec> V_in, std::vector<arma::vec> &V_out,
+                     void (T::*fp)(std::vector<arma::vec> Var_in,
+                                   std::vector<arma::vec> &Var_out),
+                     T *ClassPointer, double int_step) {
+  std::vector<arma::vec> K_TEMP;
+
+  for (unsigned int i = 0; i < V_in.size(); i++) {
+    arma::vec temp;
+    K_TEMP.push_back(temp);
+  }
+
+  ((ClassPointer)->*fp)(V_in, K_TEMP);
+
+  for (unsigned int i = 0; i < V_in.size(); i++) {
+    V_out[i] = V_in[i] + (1. / 2.) * K_TEMP[i] * int_step;
   }
 }
 #endif  // __INTEGRATE_UTIL_HH__
