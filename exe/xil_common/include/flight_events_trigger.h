@@ -93,6 +93,7 @@ extern "C" int event_liftoff(void) {
 
 extern "C" int event_acc_on(void) {
     fc.control.set_acc_control();
+    fc.rcs_fc.set_mode(0);
     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S1_CONTROL_ON;
     fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S1_CONTROL_ON);
     PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S1_CONTROL_ON", fc.ctl_tvc_db.flight_event_code);
@@ -308,9 +309,9 @@ extern "C" int slave_init_time(FlightComputer_SimObject *fc) {
 extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc) {
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
-    // jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
+    jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
     // jit_add_read(0.001 + fc->stand_still_time, "event_s2_control_on");
 
-    exec_set_terminate_time(10.001 + fc->stand_still_time);
+    exec_set_terminate_time(20.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

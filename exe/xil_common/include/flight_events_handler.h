@@ -13,7 +13,6 @@ const double PSIBDX         = -83.0;      //  Yawing   angle of veh wrt geod coo
 const double ALPHA0X        = 0;    // Initial angle-of-attack   - deg  module newton
 const double BETA0X         = 0;    // Initial sideslip angle    - deg  module newton
 const double DVBE           = 1.0;    // Vehicle geographic speed  - m/s  module newton
-const double RCS_POS        = -2.66507;  // RCS thruster position, from nose
 const double RCS_DEADZONE   = 0.1;   //  Dead zone of Schmitt trigger
 const double RCS_HYSTERESIS = 0.4;   //  Hysteresis of Schmitt trigger
 const double RCS_THRUST     = 5.0;   //  RCS thrust
@@ -297,7 +296,7 @@ extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     // jit_add_read(107.001, "event_fairing_separation");
     // jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.005);
     // jit_add_event("event_hot_staging", "HOT_STAGING", 0.005);
-    exec_set_terminate_time(10.001  + rkt->stand_still_time);
+    exec_set_terminate_time(20.001  + rkt->stand_still_time);
 }
 
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_
