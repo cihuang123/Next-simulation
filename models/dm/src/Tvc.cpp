@@ -89,11 +89,12 @@ void TVC::algorithm(double int_step) {
       break;
     case S1_TVC:
       Q_TVC.zeros();
-      S1_Eng_list[0]->Act_list[0]->Actuate(theta_a_cmd, int_step);
-      S1_Eng_list[0]->Act_list[1]->Actuate(theta_b_cmd, int_step);
+      S1_Eng_list[0]->Act_list[0]->Actuate(theta_a_cmd,
+                                           int_step);  // Pitch angle
+      S1_Eng_list[0]->Act_list[1]->Actuate(theta_b_cmd, int_step);  // Yaw angle
 
-      S1_Eng_list[0]->calculate_Q(S1_Eng_list[0]->Act_list[0]->ActOuptut,
-                                  S1_Eng_list[0]->Act_list[1]->ActOuptut,
+      S1_Eng_list[0]->calculate_Q(S1_Eng_list[0]->Act_list[1]->ActOuptut,
+                                  S1_Eng_list[0]->Act_list[0]->ActOuptut,
                                   thrust, TBI, -XCG(0), S1_Eng_list[0]->type);
       ActOutput1 = S1_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S1_Eng_list[0]->Act_list[1]->ActOuptut;
@@ -109,8 +110,8 @@ void TVC::algorithm(double int_step) {
       S2_Eng_list[0]->Act_list[0]->Actuate(0.0, int_step);
       S2_Eng_list[0]->Act_list[1]->Actuate(0.0, int_step);
 
-      S2_Eng_list[0]->calculate_Q(S2_Eng_list[0]->Act_list[0]->ActOuptut,
-                                  S2_Eng_list[0]->Act_list[1]->ActOuptut,
+      S2_Eng_list[0]->calculate_Q(S2_Eng_list[0]->Act_list[1]->ActOuptut,
+                                  S2_Eng_list[0]->Act_list[0]->ActOuptut,
                                   thrust, TBI, -XCG(0), S2_Eng_list[0]->type);
       ActOutput1 = S2_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S2_Eng_list[0]->Act_list[1]->ActOuptut;
@@ -126,8 +127,8 @@ void TVC::algorithm(double int_step) {
       S3_Eng_list[0]->Act_list[0]->Actuate(0.0, int_step);
       S3_Eng_list[0]->Act_list[1]->Actuate(0.0, int_step);
 
-      S3_Eng_list[0]->calculate_Q(S3_Eng_list[0]->Act_list[0]->ActOuptut,
-                                  S3_Eng_list[0]->Act_list[1]->ActOuptut,
+      S3_Eng_list[0]->calculate_Q(S3_Eng_list[0]->Act_list[1]->ActOuptut,
+                                  S3_Eng_list[0]->Act_list[0]->ActOuptut,
                                   thrust, TBI, -XCG(0), S3_Eng_list[0]->type);
 
       ActOutput1 = S3_Eng_list[0]->Act_list[0]->ActOuptut;

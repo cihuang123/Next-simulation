@@ -35,3 +35,6 @@
 # Folder
 RUN_golden/
 DP_Product/
+
+# file
+.clang-format

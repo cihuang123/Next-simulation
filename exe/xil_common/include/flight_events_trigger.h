@@ -31,13 +31,14 @@ const double S1_refa           = 3.243;      //  Aerodynamics reference area
 const double S1_refd           = 2.032;     //  Aerodynamics reference length
 const double S1_VMASS0         = 48984.0;   //  Vehicle init mass
 const double S1_FMASS0         = 31175.0;   //  Vehicle init fuel mass
-const double S1_RP             = -16.84;      //  reference point
+const double S1_RP             = 16.84;      //  reference point
 const double S1_ROLL_CMD       = 0.0;       //  Roll command - deg
 const double S1_PITCH_CMD      = 80.0;
 const double S1_YAW_CMD        = -83.0;
 const double S1_ANCOMX         = -0.15;
 const double S1_ALCOMX         = 0.0;
 const double S1_GAINP          = 0.0;
+const double S1_ENG_NUM        = 1.0;
 /* S2 */
 const double S2_XCG_0          = 6.1736;    //  vehicle initial xcg
 const double S2_XCG_1          = 5.914;     //  vehicle final xcg
@@ -55,6 +56,7 @@ const double S2_refd           = 1.36;     //  Aerodynamics reference length
 const double S2_VMASS0         = 3844.1;   //  Vehicle init mass
 const double S2_FMASS0         = 2880.44;   //  Vehicle init fuel mass
 const double S2_RP             = 9.749;
+const double S2_ENG_NUM        = 1.0;
 /* S3 */
 const double S3_XCG_0          = 2.6651;    //  vehicle initial xcg
 const double S3_XCG_1          = 2.66507;     //  vehicle final xcg
@@ -72,6 +74,7 @@ const double S3_refd           = 1.36;     //  Aerodynamics reference length
 const double S3_VMASS0         = 346.3;   //  Vehicle init mass
 const double S3_FMASS0         = 248.4;   //  Vehicle init fuel mass
 const double S3_RP             = 3.86;
+const double S3_ENG_NUM        = 1.0;
 /* Controller setting */
 const double ZACLP             = 1.0;   // Damping of accel close loop complex pole - ND
 const double ZACLY             = 1.0;   // Damping of accel close loop complex pole - ND
@@ -231,6 +234,7 @@ extern "C" int slave_init_stage1_control(FlightComputer_SimObject *fc) {
     fc->control.set_aero_coffe(S1_refd, S1_refa, S1_XCP);
     fc->control.set_feedforward_gain(S1_GAINP);
     fc->control.set_reference_point(S1_RP);
+    fc->control.set_engnum(S1_ENG_NUM);
 }
 
 extern "C" int slave_init_ins_variable(FlightComputer_SimObject *fc) {
@@ -312,6 +316,6 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
     // jit_add_read(0.001 + fc->stand_still_time, "event_s2_control_on");
 
-    exec_set_terminate_time(20.001 + fc->stand_still_time);
+    exec_set_terminate_time(12.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

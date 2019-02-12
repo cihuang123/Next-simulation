@@ -95,12 +95,6 @@ void Control::initialize() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Control::control(double int_step) {
-  arma::mat33 TLI = grab_TBICI();
-  arma::mat33 TBIC = grab_TBIC();
-  arma::mat33 TBL = TBIC * trans(TLI);
-  double altc = grab_altc();
-  euler = euler_angle(TBL);
-
   calculate_xcg_thrust(int_step);
 
   switch (maut) {
@@ -112,7 +106,7 @@ void Control::control(double int_step) {
       // calculate_xcg_thrust(int_step);
       aerodynamics_der();
       delecx = control_normal_accel(ancomx, int_step);
-      // delrcx = control_yaw_accel(alcomx, int_step);
+      delrcx = control_yaw_accel(alcomx, int_step);
       theta_a_cmd = delecx;
       theta_b_cmd = delrcx;
       break;
@@ -470,6 +464,8 @@ void Control::set_attcmd(double in1, double in2, double in3) {
   this->pitchcmd = in2;
   this->yawcmd = in3;
 }
+void Control::set_engnum(double in) { eng_num = in; }
+
 void Control::set_aoacmd(double in) { this->aoacmd = in; }
 
 arma::mat33 Control::build_321_rotation_matrix(arma::vec3 angle) {
@@ -544,7 +540,7 @@ void Control::calculate_xcg_thrust(double int_step) {
   fmasse += mdot * int_step;
   mass_ratio = fmasse / fmass0;
   xcg = xcg_0 + (xcg_1 - xcg_0) * mass_ratio;
-  thrust = isp * mdot * AGRAV / 4.0;
+  thrust = isp * mdot * AGRAV / eng_num;
   IBBB2 = IBBB0 + (IBBB1 - IBBB0) * mass_ratio;
   vmass = vmass0 - fmasse;
 }

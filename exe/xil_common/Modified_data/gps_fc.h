@@ -8,7 +8,7 @@
 extern "C" void record_gps_slave() {
     Trick::DRAscii *drg = new Trick::DRAscii("ngps_slave");
     drg->set_freq(Trick::DR_Always);
-    drg->set_cycle(0.05);
+    drg->set_cycle(0.005);
     drg->set_single_prec_only(false);
     // drg->add_variable("fc.time->gpstime.SOW");
     //  drg->add_variable("fc.gps.state_pos");
@@ -78,7 +78,8 @@ extern "C" void record_gps_slave() {
      drg->add_variable("fc.rcs_fc.e_roll");
      drg->add_variable("fc.rcs_fc.e_pitch");
      drg->add_variable("fc.rcs_fc.e_yaw");
-    //  drg->add_variable("fc.control.fmasse");
+     drg->add_variable("fc.control.delecx");
+     drg->add_variable("fc.control.delrcx");
     //  drg->add_variable("fc.control._WBICBT[0]");
     //  drg->add_variable("fc.control._WBICBT[1]");
     //  drg->add_variable("fc.control._WBICBT[2]");

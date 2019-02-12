@@ -73,6 +73,7 @@ class Control {
   void set_kaoapp(double in);
   void set_kaoad(double in);
   void set_aoacmd(double in);
+  void set_engnum(double in);
 
   void get_control_gain(double in1, double in2, double in3, double in4,
                         double in5, double in6, double in7, double in8,
@@ -378,6 +379,8 @@ class Control {
   double refd;
   double xcp;
   double pdynmc;
+
+  double eng_num;
 };
 
 #endif  // __CONTROL_HH__

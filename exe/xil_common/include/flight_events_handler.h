@@ -296,7 +296,7 @@ extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     // jit_add_read(107.001, "event_fairing_separation");
     // jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.005);
     // jit_add_event("event_hot_staging", "HOT_STAGING", 0.005);
-    exec_set_terminate_time(20.001  + rkt->stand_still_time);
+    exec_set_terminate_time(12.001  + rkt->stand_still_time);
 }
 
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_

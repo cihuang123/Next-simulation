@@ -13,12 +13,12 @@
 double integrate(const double &dydx_new, const double &dydx, const double &y,
                  const double &int_step) {
   // return y+int_step*(dydx+0.5*int_step*dydx_new);
-  // return y+(dydx_new+dydx)*int_step/2.;
+  return y + (dydx_new + dydx) * int_step / 2.;
   // return y +
   //        (dydx + 4. * ((dydx_new + dydx) / 2.) + dydx_new) * int_step / 6.;
   // return y + (dydx * int_step);
-  return y + ((3.0 / 2.0) * dydx_new * int_step) -
-         ((1.0 / 2.0) * dydx * int_step);
+  // return y + ((3.0 / 2.0) * dydx_new * int_step) -
+  //        ((1.0 / 2.0) * dydx * int_step);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

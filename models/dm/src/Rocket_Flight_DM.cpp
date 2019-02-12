@@ -773,8 +773,9 @@ void Rocket_Flight_DM::propagate_WBIB(double int_step, arma::vec3 FMB_in,
   // integrating the angular velocity acc wrt the inertial frame in body coord
   // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm
   // test
-  INTEGRATE_MAT(WBIB, arma::solve(IBBB, (FMB_in - skew_sym(this->WBIB) * IBBB *
-                                                      this->WBIB)));
+  INTEGRATE_MAT(
+      WBIB,
+      arma::solve(IBBB, (FMB_in - skew_sym(this->WBIB) * IBBB * this->WBIB)));
 }
 
 arma::vec3 Rocket_Flight_DM::calculate_WBII(arma::mat33 TBI_in) {
@@ -1186,7 +1187,7 @@ void Rocket_Flight_DM::collect_forces_and_propagate() {
   data_exchang->hget("XCG", rhoC_1);
   dang_1 = WBIB;
 
-  rhoC_1(0) = rhoC_1(0) - reference_point;
+  rhoC_1(0) = -rhoC_1(0) - reference_point;
 
   calculate_I1();
   gamma_beta();
