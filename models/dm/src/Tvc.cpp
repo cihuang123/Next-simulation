@@ -95,7 +95,7 @@ void TVC::algorithm(double int_step) {
 
       S1_Eng_list[0]->calculate_Q(S1_Eng_list[0]->Act_list[1]->ActOuptut,
                                   S1_Eng_list[0]->Act_list[0]->ActOuptut,
-                                  thrust, TBI, -XCG(0), S1_Eng_list[0]->type);
+                                  thrust, TBI, XCG(0), S1_Eng_list[0]->type);
       ActOutput1 = S1_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S1_Eng_list[0]->Act_list[1]->ActOuptut;
 

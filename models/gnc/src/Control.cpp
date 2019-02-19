@@ -161,6 +161,11 @@ void Control::set_close_loop_pole(double in1, double in2) {
   zacly = in2;
 }
 
+void Control::set_factor(double in1, double in2) {
+  factwaclp = in1;
+  factwacly = in2;
+}
+
 void Control::set_thtvdcomx(double in) { this->thtvdcomx = in; }
 // void Control::set_maut(double in) { this->maut = in; }
 void Control::set_delimx(double in) { this->delimx = in; }
@@ -377,13 +382,14 @@ void Control::S3_B_pseudo_G(arma::vec3 cmd, double int_step) {
 }
 
 void Control::set_controller_var(double in1, double in2, double in3, double in4,
-                                 double in5, double in6) {
-  mdot = in1;
-  fmass0 = in2;
-  xcg_1 = in3;
-  xcg_0 = in4;
-  isp = in5;
-  fmasse = in6;
+                                 double in5, double in6, double in7) {
+  vmass0 = in1;
+  mdot = in2;
+  fmass0 = in3;
+  xcg_1 = in4;
+  xcg_0 = in5;
+  isp = in6;
+  fmasse = in7;
 }
 
 void Control::set_IBBB0(double in1, double in2, double in3) {
@@ -508,17 +514,17 @@ arma::vec3 Control::euler_angle(arma::mat33 TBD) {
     thtbdc = asin(-tbd13);
     cthtbd = cos(thtbdc);
   } else {
-    thtbdc = PI / 2 * sign(-tbd13);
+    thtbdc = PI / 2. * sign(-tbd13);
     cthtbd = EPS;
   }
   // computed yaw angle: 'psibdc'
   double cpsi = tbd11 / cthtbd;
-  if (fabs(cpsi) > 1) cpsi = 1 * sign(cpsi);
+  if (fabs(cpsi) > 1) cpsi = 1. * sign(cpsi);
   psibdc = acos(cpsi) * sign(tbd12);
 
   // computed roll angle: 'phibdc'
   double cphi = tbd33 / cthtbd;
-  if (fabs(cphi) > 1) cphi = 1 * sign(cphi);
+  if (fabs(cphi) > 1) cphi = 1. * sign(cphi);
 
   // selecting the Euler roll angle of flight mechanics (not for thtbdc=90 or
   // =-90deg)
@@ -568,7 +574,7 @@ void Control::aerodynamics_der() {
   double altc = grab_altc();
   double phipcx = grab_phipcx();
   double alppcx = grab_alppcx();
-  arma::vec3 WBECB = grab_WBECB();
+  // arma::vec3 WBECB = grab_WBECB();
 
   //-------------------------------------------------------------------------
   // MOI components
@@ -605,7 +611,7 @@ void Control::aerodynamics_der() {
 
   // // looking up pitching moment coefficients in aeroballistic coord
   // clm0 = aerotable.look_up("clm0_vs_mach_alpha", vmach, alppcx, 1);
-  double clmq = aerotable.look_up("clmq_vs_mach", vmach, 1);
+  double clmq = aerotable.look_up("clmq_vs_mach", vmach, 0);
   // pitching moment coefficient
   // double clmaref = clm0 + clmq * qqax * refd / (2. * dvba);
   // clma = clmaref - cna * (XCP(0) - XCG(0)) / refd;
@@ -618,8 +624,8 @@ void Control::aerodynamics_der() {
 
   // calculating normal force dim derivative wrt alpha 'cla'
 
-  double cn0p = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx, 1);
-  double cn0m = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx, 1);
+  double cn0p = aerotable.look_up("cn0_vs_mach_alpha", vmach, alplx, 0);
+  double cn0m = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx, 0);
 
   // replacing value from previous cycle, only if within max alpha limit
   // if(alplx<alplimx)
@@ -627,8 +633,8 @@ void Control::aerodynamics_der() {
 
   // calculating pitch moment dim derivative wrt alpha 'cma'
 
-  double clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx, 1);
-  double clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx, 1);
+  double clm0p = aerotable.look_up("clm0_vs_mach_alpha", vmach, alplx, 0);
+  double clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx, 0);
 
   // replacing value from previous cycle, only if within max alpha limit
   // if(alppcx<alplimx)
@@ -657,7 +663,7 @@ void Control::aerodynamics_der() {
   dnd = duml * cn0;
   double dumm = pdynmc * refa * refd / ibbb22;
   dma = dumm * cma / RAD;
-  dmq = dumm * (refd / (2 * dvbec)) * cmq;
+  dmq = dumm * (refd / (2. * dvbec)) * cmq;
   dmde = dumm * cmde / RAD;
 
   // Dimensional derivatives in plane (converted to 1/rad where required)
@@ -666,12 +672,12 @@ void Control::aerodynamics_der() {
   dydr = dumy * cydr / RAD;
   double dumn = pdynmc * refa * refd / ibbb33;
   dnb = dumn * cnb / RAD;
-  dnr = dumn * (refd / (2 * dvbec)) * cnr;
+  dnr = dumn * (refd / (2. * dvbec)) * cnr;
   dndr = dumn * cndr / RAD;
 
   // Dimensional derivatives in roll (converted to 1/rad where required)
   double dumll = pdynmc * refa * refd / ibbb11;
-  dllp = dumll * (refd / (2 * dvbec)) * cllp;
+  dllp = dumll * (refd / (2. * dvbec)) * cllp;
   dllda = dumll * cllda / RAD;
 
   // TVC control derivatives
@@ -694,19 +700,19 @@ void Control::aerodynamics_der() {
   double a21 = dla;
   double a22 = -dla / dvbec;
 
-  double arg = pow((a11 + a22), 2) - 4. * (a11 * a22 - a12 * a21);
+  double arg = pow((a11 + a22), 2.) - 4. * (a11 * a22 - a12 * a21);
   if (arg >= 0.) {
     wnp = 0.;
     zetp = 0.;
     double dum = a11 + a22;
-    realp1 = (dum + sqrt(arg)) / 2;
-    realp2 = (dum - sqrt(arg)) / 2;
-    rpreal = (realp1 + realp2) / 2;
+    realp1 = (dum + sqrt(arg)) / 2.;
+    realp2 = (dum - sqrt(arg)) / 2.;
+    rpreal = (realp1 + realp2) / 2.;
   } else {
     realp1 = 0.;
     realp2 = 0.;
     wnp = sqrt(a11 * a22 - a12 * a21);
-    zetp = -(a11 + a22) / (2 * wnp);
+    zetp = -(a11 + a22) / (2. * wnp);
     rpreal = -zetp * wnp;
   }
   // diagnostics: yaw plane roots
@@ -714,17 +720,17 @@ void Control::aerodynamics_der() {
   if (dyb)
     a12 = dnb / dyb;
   else
-    a12 = 0;
+    a12 = 0.;
   a21 = -dyb;
   a22 = dyb / dvbec;
-  arg = pow((a11 + a22), 2) - 4 * (a11 * a22 - a12 * a21);
+  arg = pow((a11 + a22), 2.) - 4. * (a11 * a22 - a12 * a21);
   if (arg >= 0.) {
     wny = 0.;
     zety = 0.;
     double dum = a11 + a22;
-    realy1 = (dum + sqrt(arg)) / 2;
-    realy2 = (dum - sqrt(arg)) / 2;
-    ryreal = (realy1 + realy2) / 2;
+    realy1 = (dum + sqrt(arg)) / 2.;
+    realy2 = (dum - sqrt(arg)) / 2.;
+    ryreal = (realy1 + realy2) / 2.;
   } else {
     realy1 = 0.;
     realy2 = 0.;
@@ -770,13 +776,13 @@ double Control::control_normal_accel(double ancomx, double int_step) {
   arma::vec3 FSPCB = grab_FSPCB();
   //-------------------------------------------------------------------------
   // calculating online close loop poles
-  waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwaclp);
-  paclp = 0.7 + 1e-5 * (pdynmc - 20e3) * (1 + factwaclp);
+  waclp = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1. + factwaclp);
+  paclp = 0.7 + 1e-5 * (pdynmc - 20e3) * (1. + factwaclp);
 
   // calculating three feedback gains
 
   gainfb3 = waclp * waclp * paclp / (dla * dmde);
-  gainfb2 = (2 * zaclp * waclp + paclp + dmq - dla / dvbec) / dmde;
+  gainfb2 = (2. * zaclp * waclp + paclp + dmq - dla / dvbec) / dmde;
   gainfb1 = (waclp * waclp + 2. * zaclp * waclp * paclp + dma +
              dmq * dla / dvbec - gainfb2 * dmde * dla / dvbec) /
                 (dla * dmde) -
@@ -834,12 +840,12 @@ double Control::control_yaw_accel(double alcomx, double int_step) {
 
   //-------------------------------------------------------------------------
   // calculating close loop poles
-  wacly = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1 + factwacly);
-  pacly = 0.7 + 1e-5 * (pdynmc - 20e3) * (1 + factwacly);
+  wacly = (0.1 + 0.5e-5 * (pdynmc - 20e3)) * (1. + factwacly);
+  pacly = 0.7 + 1e-5 * (pdynmc - 20e3) * (1. + factwacly);
 
   // calculating three feedback gains
   double gainfb3 = -wacly * wacly * pacly / (dyb * dndr);
-  double gainfb2 = (2 * zacly * wacly + pacly + dnr + dyb / dvbec) / dndr;
+  double gainfb2 = (2. * zacly * wacly + pacly + dnr + dyb / dvbec) / dndr;
   double gainfb1 = (-wacly * wacly - 2. * zacly * wacly * pacly + dnb +
                     dnr * dyb / dvbec - gainfb2 * dndr * dnb / dvbec) /
                        (dyb * dndr) -

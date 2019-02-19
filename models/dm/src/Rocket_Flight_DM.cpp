@@ -388,7 +388,7 @@ void Rocket_Flight_DM::init() {
   data_exchang->hget("XCG_0", XCG);
   build_WEII();
   reference_point_calc();
-  rhoC_1(0) = -XCG(0) - reference_point;
+  rhoC_1(0) = XCG(0) - reference_point;
   rhoC_1(1) = 0.0;
   rhoC_1(2) = 0.0;
 
@@ -506,7 +506,7 @@ void Rocket_Flight_DM::reference_point_calc() {
   if (reference_point_flag == 0) return;
   arma::vec3 XCG;
   data_exchang->hget("XCG", XCG);
-  reference_point = -XCG(0);
+  reference_point = XCG(0);
 }
 
 void Rocket_Flight_DM::algorithm(double int_step) {
@@ -538,7 +538,7 @@ void Rocket_Flight_DM::algorithm(double int_step) {
 
   data_exchang->hget("XCG", XCG);
 
-  rhoC_IMU(0) = -XCG(0) - (reference_point);
+  rhoC_IMU(0) = XCG(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
 
@@ -950,7 +950,7 @@ void Rocket_Flight_DM::RK4F(std::vector<arma::vec> Var_in,
   data_exchang->hget("XCG", XCG);
   WBIBD = ddang_1;
 
-  rhoC_IMU(0) = -XCG(0) - (reference_point);
+  rhoC_IMU(0) = XCG(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
   arma::vec3 ddrhoC_IMU =
@@ -1187,7 +1187,7 @@ void Rocket_Flight_DM::collect_forces_and_propagate() {
   data_exchang->hget("XCG", rhoC_1);
   dang_1 = WBIB;
 
-  rhoC_1(0) = -rhoC_1(0) - reference_point;
+  rhoC_1(0) = rhoC_1(0) - reference_point;
 
   calculate_I1();
   gamma_beta();

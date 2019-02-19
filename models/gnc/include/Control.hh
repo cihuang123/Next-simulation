@@ -30,6 +30,7 @@ class Control {
   // double control_pitch_rate(double qqdx);
   // double control_gamma(double thtvdcomx);
   void set_close_loop_pole(double in1, double in2);
+  void set_factor(double in1, double in2);
   void set_feedforward_gain(double in1);
   void set_thtvdcomx(double in);
   // void set_maut(double in);
@@ -49,7 +50,7 @@ class Control {
   void set_IBBB0(double in1, double in2, double in3);
   void set_IBBB1(double in1, double in2, double in3);
   void set_controller_var(double in1, double in2, double in3, double in4,
-                          double in5, double in6);
+                          double in5, double in6, double in7);
   void set_S2_PITCH_DOWN_I();
   void set_S2_PITCH_DOWN_II();
   void set_S3_PITCH_DOWN();

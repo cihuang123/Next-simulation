@@ -218,7 +218,7 @@ extern "C" int event_acc_on(void) {
 
 extern "C" int slave_init_stage1_control(FlightComputer_SimObject *fc) {
     /* Control variable Stage2 */
-    fc->control.set_controller_var(S1_FUEL_FLOW_RATE, S1_FMASS0, S1_XCG_1, S1_XCG_0, S1_SPI, 0.0);
+    fc->control.set_controller_var(S1_VMASS0, S1_FUEL_FLOW_RATE, S1_FMASS0, S1_XCG_1, S1_XCG_0, S1_SPI, 0.0);
     fc->control.set_IBBB0(S1_MOI_ROLL_0, S1_MOI_PITCH_0, S1_MOI_YAW_0);
     fc->control.set_IBBB1(S1_MOI_ROLL_1, S1_MOI_PITCH_1, S1_MOI_YAW_1);
     fc->rcs_fc.set_rcs_tau(RCS_TAU);
@@ -231,6 +231,7 @@ extern "C" int slave_init_stage1_control(FlightComputer_SimObject *fc) {
     fc->control.load_aerotable("../../../tables/Aero_Insertion_S1.txt");
     fc->control.atmosphere_use_nasa();
     fc->control.set_close_loop_pole(ZACLP, ZACLY);
+    fc->control.set_factor(FACTWACLP, FACTWACLY);
     fc->control.set_aero_coffe(S1_refd, S1_refa, S1_XCP);
     fc->control.set_feedforward_gain(S1_GAINP);
     fc->control.set_reference_point(S1_RP);
@@ -316,6 +317,6 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
     // jit_add_read(0.001 + fc->stand_still_time, "event_s2_control_on");
 
-    exec_set_terminate_time(12.001 + fc->stand_still_time);
+    exec_set_terminate_time(60.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

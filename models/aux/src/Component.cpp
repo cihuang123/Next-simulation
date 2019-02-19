@@ -114,7 +114,8 @@ void ENG::calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
   rho_en_1(1) = 0.0;
   rho_en_1(2) = 0.0;
 
-  rho_en_1 = rho_en_1 - ENG_HINGE_POS;
+  rho_en_1 = ENG_HINGE_POS -
+             rho_en_1;  // hint: Reference ponit to Engine hinge position
 
   switch (TYPE) {
     case X:
@@ -168,7 +169,8 @@ void ENG::calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
   rho_en_1(1) = 0.0;
   rho_en_1(2) = 0.0;
 
-  rho_en_1 = rho_en_1 - ENG_HINGE_POS;
+  rho_en_1 = ENG_HINGE_POS -
+             rho_en_1;  // hint: Reference ponit to Engine hinge position
 
   switch (TYPE) {
     case YZ:
