@@ -147,7 +147,7 @@ extern "C" void master_init_time(Rocket_SimObject *rkt) {
 extern "C" void master_init_environment(Rocket_SimObject *rkt) {
     /***************************************environment*************************************************************/
     rkt->env.set_RNP();
-    rkt->env.atmosphere_use_nasa();
+    rkt->env.atmosphere_use_public();
     rkt->env.set_no_wind();
     rkt->env.set_no_wind_turbulunce();
     rkt->gps_con.readfile("../../../tables/brdc0810.17n");

@@ -228,8 +228,8 @@ extern "C" int slave_init_stage1_control(FlightComputer_SimObject *fc) {
 
     fc->control.set_ancomx(S1_ANCOMX);
     fc->control.set_alcomx(S1_ALCOMX);
-    fc->control.load_aerotable("../../../tables/Aero_Insertion_S1.txt");
-    fc->control.atmosphere_use_nasa();
+    fc->control.load_aerotable("../../../tables/aero_table_slv3.txt");
+    fc->control.atmosphere_use_public();
     fc->control.set_close_loop_pole(ZACLP, ZACLY);
     fc->control.set_factor(FACTWACLP, FACTWACLY);
     fc->control.set_aero_coffe(S1_refd, S1_refa, S1_XCP);

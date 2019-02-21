@@ -11,6 +11,7 @@ PROGRAMMERS:
 #include <armadillo>
 #include "aux.hh"
 #include "datadeck.hh"
+#include "env/atmosphere76.hh"
 #include "env/atmosphere_nasa2002.hh"
 #include "math_utility.hh"
 #include "matrix/utility.hh"
@@ -91,6 +92,7 @@ class Control {
   void set_engine_d(double in);
   void load_aerotable(const char* filename);
   void atmosphere_use_nasa();
+  void atmosphere_use_public();
   void pitch_down_test(double pitchcmd, double int_step);
 
   arma::vec3 euler_angle(arma::mat33 TBD);
@@ -363,6 +365,19 @@ class Control {
   double dllp;
   double dllda;
   double dnd;
+  double cla;
+  double clde;
+  double cyb;
+  double cydr;
+  double cllda;
+  double cllp;
+  double cma;
+  double cmde;
+  double cmq;
+  double cnb;
+  double cndr;
+  double cnr;
+  double cn0;
   // diagnostics
   double stmarg_yaw;
   double stmarg_pitch;
@@ -380,6 +395,7 @@ class Control {
   double refd;
   double xcp;
   double pdynmc;
+  double vmach;
 
   double eng_num;
 };

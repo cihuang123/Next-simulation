@@ -40,6 +40,8 @@ extern "C" void record_gps_slave() {
     drg->add_variable("fc.ins.phibdcx");
     drg->add_variable("fc.ins.thtbdcx");
     drg->add_variable("fc.ins.psibdcx");
+    drg->add_variable("fc.control.vmach");
+    drg->add_variable("fc.ins.alppcx");
     // drg->add_variable("fc.ins._VBEEC[0]");
     // drg->add_variable("fc.ins._VBEEC[1]");
     // drg->add_variable("fc.ins._VBEEC[2]");
@@ -74,12 +76,14 @@ extern "C" void record_gps_slave() {
      // drg->add_variable("fc.control.dma");
      // drg->add_variable("fc.control.dmde");
      // drg->add_variable("fc.control.dmq");
-     // drg->add_variable("fc.control.pdynmc");
+     drg->add_variable("fc.control.pdynmc");
      drg->add_variable("fc.rcs_fc.e_roll");
      drg->add_variable("fc.rcs_fc.e_pitch");
      drg->add_variable("fc.rcs_fc.e_yaw");
      drg->add_variable("fc.control.delecx");
      drg->add_variable("fc.control.delrcx");
+     drg->add_variable("fc.control.vmass");
+     drg->add_variable("fc.control.fmasse");
     //  drg->add_variable("fc.control._WBICBT[0]");
     //  drg->add_variable("fc.control._WBICBT[1]");
     //  drg->add_variable("fc.control._WBICBT[2]");

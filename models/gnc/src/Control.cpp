@@ -123,6 +123,8 @@ void Control::atmosphere_use_nasa() {
   atmosphere = new cad::Atmosphere_nasa2002();
 }
 
+void Control::atmosphere_use_public() { atmosphere = new cad::Atmosphere76(); }
+
 void Control::Quaternion_cmd(double int_step) {
   // arma::vec4 TBDQ = grab_TBDQ();
   arma::vec3 ANGLECMD;
@@ -553,22 +555,21 @@ void Control::calculate_xcg_thrust(double int_step) {
 
 void Control::aerodynamics_der() {
   // from aerodynamics module
-  double cla(0);
-  double clde(0);
-  double cyb(0);
-  double cydr(0);
-  double cllda(0);
-  double cllp(0);
-  double cma(0);
-  double cmde(0);
-  double cmq(0);
-  double cnb(0);
-  double cndr(0);
-  double cnr(0);
-  double cn0(0);
+  // double cla(0);
+  // double clde(0);
+  // double cyb(0);
+  // double cydr(0);
+  // double cllda(0);
+  // double cllp(0);
+  // double cma(0);
+  // double cmde(0);
+  // double cmq(0);
+  // double cnb(0);
+  // double cndr(0);
+  // double cnr(0);
+  // double cn0(0);
 
   // from other modules
-  double vmach(0);
   double dvbec = grab_dvbec();
   double gtvc(1.0);
   double altc = grab_altc();
@@ -628,8 +629,7 @@ void Control::aerodynamics_der() {
   double cn0m = aerotable.look_up("cn0_vs_mach_alpha", vmach, alpmx, 0);
 
   // replacing value from previous cycle, only if within max alpha limit
-  // if(alplx<alplimx)
-  cla = (cn0p - cn0m) / (alplx - alpmx);
+  if (alplx < 20.0) cla = (cn0p - cn0m) / (alplx - alpmx);
 
   // calculating pitch moment dim derivative wrt alpha 'cma'
 
@@ -637,8 +637,8 @@ void Control::aerodynamics_der() {
   double clm0m = aerotable.look_up("clm0_vs_mach_alpha", vmach, alpmx, 0);
 
   // replacing value from previous cycle, only if within max alpha limit
-  // if(alppcx<alplimx)
-  cma = (clm0p - clm0m) / (alplx - alpmx) - cla * (xcp - xcg) / refd;
+  if (alppcx < 20.0)
+    cma = (clm0p - clm0m) / (alplx - alpmx) - cla * (xcp - xcg) / refd;
 
   // converting output to be compatible with 'aerodynamics_der()'
   // force

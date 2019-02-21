@@ -74,8 +74,9 @@ void IntegratorRK4(std::vector<arma::vec> V_in, std::vector<arma::vec> &V_out,
     ((ClassPointer)->*fp)(V_out, KMAT[3]);
 
     for (unsigned int i = 0; i < V_in.size(); i++) {
-      V_out[i] = V_in[i] + (int_step / 6.0) * (KMAT[0][i] + 2.0 * KMAT[1][i] +
-                                               2.0 * KMAT[2][i] + KMAT[3][i]);
+      V_out[i] = V_in[i] +
+                 (int_step / 6.0) * (KMAT[0][i] + 2.0 * KMAT[1][i] +
+                                     2.0 * KMAT[2][i] + KMAT[3][i]);
     }
   }
 }
@@ -95,7 +96,7 @@ void IntegratorEuler(std::vector<arma::vec> V_in, std::vector<arma::vec> &V_out,
   ((ClassPointer)->*fp)(V_in, K_TEMP);
 
   for (unsigned int i = 0; i < V_in.size(); i++) {
-    V_out[i] = V_in[i] + (1. / 2.) * K_TEMP[i] * int_step;
+    V_out[i] = V_in[i] + K_TEMP[i] * int_step;
   }
 }
 #endif  // __INTEGRATE_UTIL_HH__

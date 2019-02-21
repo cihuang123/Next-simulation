@@ -526,6 +526,8 @@ void Rocket_Flight_DM::algorithm(double int_step) {
 
   IntegratorRK4(V_State_In, V_State_Out, &Rocket_Flight_DM::RK4F, this,
                 int_step);
+  // IntegratorEuler(V_State_In, V_State_Out, &Rocket_Flight_DM::RK4F, this,
+  //               int_step);
 
   VBIIP = V_State_Out[0];
   SBIIP = V_State_Out[1];
