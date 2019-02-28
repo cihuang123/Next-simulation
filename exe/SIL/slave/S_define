@@ -18,6 +18,7 @@ LIBRARY DEPENDENCIES:
 ##include "DM_FSW_Interface.hh"
 ##include "flight_events_define.h"
 ##include "RcsFc.hh"
+##include "Guidance.hh"
 
 class FlightComputer_SimObject : public Trick::SimObject {
     public:
@@ -28,6 +29,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         INS ins;
 
         Control control;
+        Guidance guidance;
         RCS_FC rcs_fc;
 
         time_management *time = time_management::get_instance();
@@ -39,6 +41,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         refactor_uplink_packet_t dm_ins_db;
         refactor_ins_to_ctl_t ins_ctl_db;
         refactor_downlink_packet_t ctl_tvc_db;
+        guidnace_packet_t guidance_rcs_db;
 
         GPS_LINK_decl();
         INS_LINK_decl();
@@ -48,12 +51,13 @@ class FlightComputer_SimObject : public Trick::SimObject {
         INS_SAVE_decl();
         CONTROL_SAVE_decl();
         RCS_SAVE_decl();
+        Guidance_SAVE_decl();
 
         void link(){
             GPSLinkInData(gps, dm_ins_db, ins);
             INSLinkInData(ins, dm_ins_db, gps);
             ControlLinkInData(control, ins_ctl_db, dm_ins_db);
-            RcsLinkInData(rcs_fc, ins_ctl_db);
+            RcsLinkInData(rcs_fc, ins_ctl_db, guidance_rcs_db);
 
             /* XXX */
             ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
@@ -92,6 +96,8 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             P2 (int_step, "scheduled") ins.update(int_step);
             P2 (int_step, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
+            P2 (int_step, "scheduled") guidance.guidance(int_step);
+            P2 (int_step, "scheduled") GuidanceSaveOutData(guidance, guidance_rcs_db);
             P2 (int_step, "scheduled") control.control(int_step);
             P2 (int_step, "scheduled") rcs_fc.actuate();
             P2 (int_step, "scheduled") RCS_SaveOutData(rcs_fc, ctl_tvc_db);

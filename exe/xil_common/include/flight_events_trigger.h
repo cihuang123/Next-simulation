@@ -84,6 +84,24 @@ const double ALPHACOMX         = 0.0;   // AOA command - deg
 const double BETACOMX          = 0.0;   // Side slip angle command - deg
 const double ROLLCOMX          = 0.0;   // Roll angle command - deg
 
+/* Guidance setting */
+const double LTG_STEP          = 0.1;
+const int NUM_STAGES           = 2;
+const double DBI_DESIRED       = 6470e3;
+const double DVBI_DESIRED      = 6600.0;
+const double THTVDX_DESIRED    = 1.0;
+const double DELAY_IGNITION    = 0.1;
+const double AMIN              = 3.0;
+const double GAIN_LTG          = 0.5;
+const double LAMD_LIMIT        = 0.028;
+const double EXHAUST_VEL1      = 2795.0;
+const double EXHAUST_VEL2      = 2785.0;
+const double BURNOUT_EPOCH1    = 51.5;
+const double BURNOUT_EPOCH2    = 126.0;
+const double CHAR_TIME1        = 81.9;
+const double CHAR_TIME2        = 112.2;
+
+
 extern "C" int event_liftoff(void) {
     fc.ins.set_liftoff(1);
     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_LIFTOFF;

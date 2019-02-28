@@ -4,6 +4,7 @@
 #include "Control.hh"
 #include "DM_FSW_Interface.hh"
 #include "GPS.hh"
+#include "Guidance.hh"
 #include "Ins.hh"
 
 #define GPS_LINK_decl()                                                 \
@@ -55,13 +56,21 @@
     control.grab_ABICB = GRAB_VAR(ins_ctl_db.ins_ABICB);                      \
   }
 
-#define RCS_LINK_decl()                                                   \
-  void RcsLinkInData(RCS_FC &rcs_fc, refactor_ins_to_ctl_t &ins_ctl_db) { \
-    rcs_fc.grab_WBICB =                                                   \
-        GRAB_VAR(arma::vec3(ins_ctl_db.trick_data.gyro_WBICB));           \
-    rcs_fc.grab_phibdcx = GRAB_VAR(ins_ctl_db.ins_phibdcx);               \
-    rcs_fc.grab_thtbdcx = GRAB_VAR(ins_ctl_db.ins_thtbdcx);               \
-    rcs_fc.grab_psibdcx = GRAB_VAR(ins_ctl_db.ins_psibdcx);               \
+#define RCS_LINK_decl()                                                     \
+  void RcsLinkInData(RCS_FC &rcs_fc, refactor_ins_to_ctl_t &ins_ctl_db,     \
+                     guidnace_packet_t &guidance_rcs_db) {                  \
+    rcs_fc.grab_WBICB =                                                     \
+        GRAB_VAR(arma::vec3(ins_ctl_db.trick_data.gyro_WBICB));             \
+    rcs_fc.grab_phibdcx = GRAB_VAR(ins_ctl_db.ins_phibdcx);                 \
+    rcs_fc.grab_thtbdcx = GRAB_VAR(ins_ctl_db.ins_thtbdcx);                 \
+    rcs_fc.grab_psibdcx = GRAB_VAR(ins_ctl_db.ins_psibdcx);                 \
+    rcs_fc.grab_UTBC = GRAB_VAR(arma::vec3(guidance_rcs_db.guidance_UTBC)); \
+  }
+
+#define Guidance_SAVE_decl()                                       \
+  void GuidanceSaveOutData(Guidance &guidance,                     \
+                           guidnace_packet_t &guidance_rcs_db) {   \
+    STORE_VEC(guidance_rcs_db.guidance_UTBC, guidance.get_UTBC()); \
   }
 
 #define INS_SAVE_decl()                                               \

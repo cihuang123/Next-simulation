@@ -67,10 +67,10 @@ void RCS_FC::set_mode(int in) { rcs_mode = static_cast<RCS_MODE>(in); }
 ///////////////////////////////////////////////////////////////////////////////
 
 void RCS_FC::actuate() {
-  // arma::vec3 UTBC = grab_UTBC();
   arma::vec WBICB = grab_WBICB();
   double alphacomx = 0.0;
   double betacomx = 0.0;
+  arma::vec3 UTBC = grab_UTBC();
 
   double qqcx = WBICB(1) * DEG;
   double ppcx = WBICB(0) * DEG;
@@ -99,10 +99,10 @@ void RCS_FC::actuate() {
       e_yaw = psibdcomx - (rcs_tau * rrcx + psibdcx);
       break;
 
-      // case THRUST_VECTOR_DIRECTION_AND_ROLL_ANGLE_CONTROL:
-      //     e_pitch = -rcs_tau * qqcx - UTBC[2] * DEG;
-      //     e_yaw   = -rcs_tau * rrcx + UTBC[1] * DEG;
-      //     break;
+    case THRUST_VECTOR_DIRECTION_AND_ROLL_ANGLE_CONTROL:
+      e_pitch = -rcs_tau * qqcx - UTBC[2] * DEG;
+      e_yaw = -rcs_tau * rrcx + UTBC[1] * DEG;
+      break;
 
     case INCIDENCE_AND_ROLL_ANGLE_CONTROL:
       e_pitch = alphacomx - (rcs_tau * qqcx + alphacx);

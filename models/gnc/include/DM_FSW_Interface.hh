@@ -27,6 +27,10 @@ typedef struct __attribute__((packed)) {
 #endif
 
 typedef struct __attribute__((packed)) {
+  double guidance_UTBC[3];
+} guidnace_packet_t;
+
+typedef struct __attribute__((packed)) {
   /* gyro */
   double gyro_WBICB[3];
   double gyro_EWBIB[3];
@@ -95,16 +99,10 @@ typedef struct __attribute__((packed)) {
   double guid_e_yaw;
 } ctler_to_rcs_t;
 
-typedef struct __attribute__((packed)) {
-  double temp;
-} to_can_t;
+typedef struct __attribute__((packed)) { double temp; } to_can_t;
 
-typedef struct __attribute__((packed)) {
-  double tmp;
-} ctler_to_ordnctrl_t;
+typedef struct __attribute__((packed)) { double tmp; } ctler_to_ordnctrl_t;
 
-typedef struct __attribute__((packed)) {
-  double temp;
-} ctler_to_flowctrl_t;
+typedef struct __attribute__((packed)) { double temp; } ctler_to_flowctrl_t;
 
 #endif  // __DM_FSW_INTERFACE_HH__
