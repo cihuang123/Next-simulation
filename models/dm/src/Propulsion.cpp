@@ -146,9 +146,12 @@ void Propulsion::set_stage_1() { this->stage = STAGE_1; }
 
 void Propulsion::algorithm(double int_step) {
   double psl(101300);  // chamber pressure - Pa
-
+  int beco_flag = grab_beco_flag();
   double press;
   data_exchang->hget("press", &press);
+  if (beco_flag == 1) {
+    thrust_state = NO_THRUST;
+  }
   // no thrusting
   switch (this->thrust_state) {
     case NO_THRUST:

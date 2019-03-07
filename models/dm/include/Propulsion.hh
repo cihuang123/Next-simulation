@@ -59,7 +59,7 @@ class Propulsion : public Actuator {
   void set_HOT_STAGE();
   // XXX: get_thrust_state
   enum THRUST_TYPE get_thrust_state();
-
+  std::function<int()> grab_beco_flag;
   /* Input File */
   // void set_vmass0(double);
   // void set_fmass0(double);

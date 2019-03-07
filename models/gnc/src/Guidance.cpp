@@ -45,6 +45,28 @@ Guidance &Guidance::operator=(const Guidance &other) {
   return *this;
 }
 
+void Guidance::set_guidance_var(double in1, int in2, double in3, double in4,
+                                double in5, double in6, double in7, double in8,
+                                double in9, double in10, double in11,
+                                double in12, double in13, double in14) {
+  ltg_step = in1;
+  num_stages = in2;
+  dbi_desired = in3;
+  dvbi_desired = in4;
+  thtvdx_desired = in5;
+  delay_ignition = in6;
+  amin = in7;
+  lamd_limit = in8;
+  exhaust_vel1 = in9;
+  exhaust_vel2 = in10;
+  burnout_epoch1 = in11;
+  burnout_epoch2 = in12;
+  char_time1 = in13;
+  char_time2 = in14;
+}
+
+void Guidance::set_ltg_guidance() { mguide = 5; };
+
 void Guidance::default_data() {
   init_flag = 1;
   inisw_flag = 1;
@@ -74,7 +96,6 @@ void Guidance::initialize() {}
 void Guidance::guidance(double int_step) {
   // local module variable
 
-  int mprop = grab_mprop();
   arma::mat33 TBIC = grab_TBIC();
   //-------------------------------------------------------------------------
   // zeroing UTBC,if no guidance
@@ -91,21 +112,13 @@ void Guidance::guidance(double int_step) {
     }
     // calling LTG guidance after every ltg_step
     if (time_ltg > ltg_step * ltg_count) {
-      // std::cout<<"Called : guidance_ltg"<<'\n';
+      std::cout << "Called : guidance_ltg" << '\n';
       ltg_count++;
-      UTIC = guidance_ltg(mprop, int_step, time_ltg);
+      UTIC = guidance_ltg(int_step, time_ltg);
       UTBC = TBIC * UTIC;
     }
   }
   //-------------------------------------------------------------------------
-  switch (mprop) {
-    case 0:
-      set_no_thrust();
-      break;
-    case 4:
-      set_ltg_thrust();
-      break;
-  }
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Linear tangent guidance (LTG) for ascent
@@ -131,8 +144,7 @@ void Guidance::guidance(double int_step) {
 // 040319 Converted from FORTRAN by Peter H Zipfel
 ///////////////////////////////////////////////////////////////////////////////
 
-arma::vec3 Guidance::guidance_ltg(int &mprop, double int_step,
-                                  double time_ltg) {
+arma::vec3 Guidance::guidance_ltg(double int_step, double time_ltg) {
   // local variables
   // Parameter output 'guidance_ltg_crct()'
   arma::vec3 VMISS;  // velocity miss - m/s
@@ -171,12 +183,12 @@ arma::vec3 Guidance::guidance_ltg(int &mprop, double int_step,
 
   // input from other modules
   double time = get_elapsed_time();
-  double dbi = grab_dbi();
-  double dvbi = grab_dvbi();
   double thtvdx = grab_thtvdx();
-  double fmassr = grab_fmassr();
+  // double fmassr = grab_fmassr();
   arma::vec3 VBIIC = grab_VBIIC();
   arma::vec3 SBIIC = grab_SBIIC();
+  double dbi = norm(SBIIC);
+  double dvbi = norm(VBIIC);
 
   arma::mat33 TBIC = grab_TBIC();
 
@@ -263,12 +275,11 @@ arma::vec3 Guidance::guidance_ltg(int &mprop, double int_step,
                     SBIIC, VBIIC);  // input
 
   // motor burning while fuel available
-  if (fmassr > 0) mprop = 4;
+  // if (fmassr > 0) mprop = 4;
 
   // cut-off logic
   if (tgo < ltg_step) {
     beco_flag = 1;
-    mprop = 0;
   }
   // boost engine cut-off print-out
   double ddb(0);
@@ -796,7 +807,7 @@ void Guidance::guidance_ltg_crct(arma::mat &SDII, arma::mat &UD, arma::mat &UY,
 arma::vec3 Guidance::get_UTBC() { return UTBC; }
 double Guidance::get_alphacomx() { return alphacomx; }
 double Guidance::get_betacomx() { return betacomx; }
-
+int Guidance::get_beco_flag() { return beco_flag; }
 void Guidance::set_degree(double a, double b) {
   alphacomx = a;
   betacomx = b;

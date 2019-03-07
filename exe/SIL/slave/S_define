@@ -47,6 +47,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
         INS_LINK_decl();
         CONTROL_LINK_decl();
         RCS_LINK_decl();
+        Guidance_LINK_decl();
 
         INS_SAVE_decl();
         CONTROL_SAVE_decl();
@@ -58,6 +59,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             INSLinkInData(ins, dm_ins_db, gps);
             ControlLinkInData(control, ins_ctl_db, dm_ins_db);
             RcsLinkInData(rcs_fc, ins_ctl_db, guidance_rcs_db);
+            GuidanceLinkData(guidance, ins_ctl_db);
 
             /* XXX */
             ins.clear_gps_flag  = [this](){ this->clear_gps = 1; };
@@ -97,7 +99,7 @@ class FlightComputer_SimObject : public Trick::SimObject {
             P2 (int_step, "scheduled") ins.update(int_step);
             P2 (int_step, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (int_step, "scheduled") guidance.guidance(int_step);
-            P2 (int_step, "scheduled") GuidanceSaveOutData(guidance, guidance_rcs_db);
+            P2 (int_step, "scheduled") GuidanceSaveOutData(guidance, guidance_rcs_db, ctl_tvc_db);
             P2 (int_step, "scheduled") control.control(int_step);
             P2 (int_step, "scheduled") rcs_fc.actuate();
             P2 (int_step, "scheduled") RCS_SaveOutData(rcs_fc, ctl_tvc_db);

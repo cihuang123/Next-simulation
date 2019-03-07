@@ -40,21 +40,21 @@ const double S1_ALCOMX         = 0.0;
 const double S1_GAINP          = 0.0;
 const double S1_ENG_NUM        = 1.0;
 /* S2 */
-const double S2_XCG_0          = 6.1736;    //  vehicle initial xcg
-const double S2_XCG_1          = 5.914;     //  vehicle final xcg
-const double S2_MOI_ROLL_0     = 860.06;    //  vehicle initial moi in roll direction
-const double S2_MOI_ROLL_1     = 357.61;     //  vehicle final moi in roll direction
-const double S2_MOI_PITCH_0    = 18932.79;  //  vehicle initial transverse moi
-const double S2_MOI_PITCH_1    = 16238.01;   //  vehicle final transverse moi
-const double S2_MOI_YAW_0      = 18932.79;  //  vehicle initial transverse moi
-const double S2_MOI_YAW_1      = 16238.01;   //  vehicle final transverse moi
-const double S2_SPI            = 280.0;     //  Specific impusle
-const double S2_FUEL_FLOW_RATE = 26.92;     //  fuel flow rate
+const double S2_XCG_0          = 5.91;    //  vehicle initial xcg
+const double S2_XCG_1          = 4.17;     //  vehicle final xcg
+const double S2_MOI_ROLL_0     = 5.043e3;    //  vehicle initial moi in roll direction
+const double S2_MOI_ROLL_1     = 2.047e3;     //  vehicle final moi in roll direction
+const double S2_MOI_PITCH_0    = 51.91e3;  //  vehicle initial transverse moi
+const double S2_MOI_PITCH_1    = 15.53e3;   //  vehicle final transverse moi
+const double S2_MOI_YAW_0      = 51.91e3;  //  vehicle initial transverse moi
+const double S2_MOI_YAW_1      = 15.53e3;   //  vehicle final transverse moi
+const double S2_SPI            = 285.0;     //  Specific impusle
+const double S2_FUEL_FLOW_RATE = 189.1;     //  fuel flow rate
 const double S2_XCP            = 5.0384;    //  Xcp location
-const double S2_refa           = 1.45;      //  Aerodynamics reference area
-const double S2_refd           = 1.36;     //  Aerodynamics reference length
-const double S2_VMASS0         = 3844.1;   //  Vehicle init mass
-const double S2_FMASS0         = 2880.44;   //  Vehicle init fuel mass
+const double S2_refa           = 3.243;      //  Aerodynamics reference area
+const double S2_refd           = 2.032;     //  Aerodynamics reference length
+const double S2_VMASS0         = 15490.0;   //  Vehicle init mass
+const double S2_FMASS0         = 9552.0;   //  Vehicle init fuel mass
 const double S2_RP             = 9.749;
 const double S2_ENG_NUM        = 1.0;
 /* S3 */
@@ -92,7 +92,6 @@ const double DVBI_DESIRED      = 6600.0;
 const double THTVDX_DESIRED    = 1.0;
 const double DELAY_IGNITION    = 0.1;
 const double AMIN              = 3.0;
-const double GAIN_LTG          = 0.5;
 const double LAMD_LIMIT        = 0.028;
 const double EXHAUST_VEL1      = 2795.0;
 const double EXHAUST_VEL2      = 2785.0;
@@ -216,23 +215,23 @@ extern "C" int event_acc_on(void) {
 //     return 0;
 // }
 
-// extern "C" int event_s1_seperation(void) {
-//     fc.control.set_controller_var(S3_MDOT, S3_FMASS0, S3_XCG_1, S3_XCG_0, S3_ISP, S3_MDOT * HS_time);
-//     fc.control.set_IBBB0(S3_MOI_ROLL_0, S3_MOI_PITCH_0, S3_MOI_YAW_0);
-//     fc.control.set_IBBB1(S3_MOI_ROLL_1, S3_MOI_PITCH_1, S3_MOI_YAW_1);
-//     fc.control.get_control_gain(S3_KPP, S3_KPI, S3_KPD, S3_KPPP, S3_PN, S3_KRP, S3_KRI, S3_KRD, S3_KRPP, S3_RN, S3_KYP, S3_KYI,
-//                                 S3_KYD, S3_KYPP, S3_YN, S3_KAOAP, S3_KAOAI, S3_KAOAD, S3_KAOAPP, S3_AOAN);
-//     fc.control.set_attcmd(S3_ROLLCMD, S3_PITCHCMD, S3_YAWCMD);
-//     fc.control.set_aoacmd(S3_AOACMD);
-//     fc.control.set_ierror_zero();
-//     fc.control.set_reference_point(S3_REFERENCE_P);
-//     fc.control.set_engine_d(0.0);
-//     // fc.control.set_S3_AOA();
-//     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S3_SEPERATION;
-//     fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S3_SEPERATION);
-//     PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S3_SEPERATION", fc.ctl_tvc_db.flight_event_code);
-//     return 0;
-// }
+extern "C" int event_s1_seperation(void) {
+    fc.control.set_controller_var(S2_VMASS0, S2_FUEL_FLOW_RATE, S2_FMASS0, S2_XCG_1, S2_XCG_0, S2_SPI, 0.0);
+    fc.control.set_IBBB0(S2_MOI_ROLL_0, S2_MOI_PITCH_0, S2_MOI_YAW_0);
+    fc.control.set_IBBB1(S2_MOI_ROLL_1, S2_MOI_PITCH_1, S2_MOI_YAW_1);
+    fc.control.set_reference_point(S2_RP);
+    fc.control.set_engine_d(0.0);
+    fc.control.set_NO_CONTROL();
+    fc.guidance.set_guidance_var(LTG_STEP, NUM_STAGES, DBI_DESIRED, DVBI_DESIRED, THTVDX_DESIRED, DELAY_IGNITION
+                                , AMIN, LAMD_LIMIT, EXHAUST_VEL1, EXHAUST_VEL2, BURNOUT_EPOCH1
+                                , BURNOUT_EPOCH2, CHAR_TIME1, CHAR_TIME2);
+    fc.guidance.set_ltg_guidance();
+    fc.rcs_fc.set_mode(2);
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S1_SEPERATION;
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S1_SEPERATION);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S1_SEPERATION", fc.ctl_tvc_db.flight_event_code);
+    return 0;
+}
 
 extern "C" int slave_init_stage1_control(FlightComputer_SimObject *fc) {
     /* Control variable Stage2 */
@@ -333,8 +332,8 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
     jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
-    // jit_add_read(0.001 + fc->stand_still_time, "event_s2_control_on");
+    jit_add_read(61.7 + fc->stand_still_time, "event_s1_seperation");
 
-    exec_set_terminate_time(60.001 + fc->stand_still_time);
+    exec_set_terminate_time(65.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

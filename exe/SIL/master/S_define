@@ -81,6 +81,8 @@ class Rocket_SimObject : public Trick::SimObject {
             rcs.grab_e_roll            = GRAB_VAR(ctl_tvc_db.e_roll);
             rcs.grab_e_pitch            = GRAB_VAR(ctl_tvc_db.e_pitch);
             rcs.grab_e_yaw            = GRAB_VAR(ctl_tvc_db.e_yaw);
+
+            propulsion.grab_beco_flag = GRAB_VAR(ctl_tvc_db.beco_flag);
         };
 
         void egse_uplink_packet_transfer(struct icf_ctrlblk_t *C) {

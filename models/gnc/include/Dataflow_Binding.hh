@@ -56,6 +56,16 @@
     control.grab_ABICB = GRAB_VAR(ins_ctl_db.ins_ABICB);                      \
   }
 
+#define Guidance_LINK_decl()                                 \
+  void GuidanceLinkData(Guidance &guidance,                  \
+                        refactor_ins_to_ctl_t &ins_ctl_db) { \
+    guidance.grab_thtvdx = GRAB_VAR(ins_ctl_db.ins_thtvdcx); \
+    guidance.grab_VBIIC = GRAB_VEC3(ins_ctl_db.ins_VBIIC);   \
+    guidance.grab_SBIIC = GRAB_VEC3(ins_ctl_db.ins_SBIIC);   \
+    guidance.grab_TBIC = GRAB_MAT33(ins_ctl_db.ins_TBIC);    \
+    guidance.grab_FSPCB = GRAB_VEC3(ins_ctl_db.accel_FSPCB); \
+  }
+
 #define RCS_LINK_decl()                                                     \
   void RcsLinkInData(RCS_FC &rcs_fc, refactor_ins_to_ctl_t &ins_ctl_db,     \
                      guidnace_packet_t &guidance_rcs_db) {                  \
@@ -67,10 +77,12 @@
     rcs_fc.grab_UTBC = GRAB_VAR(arma::vec3(guidance_rcs_db.guidance_UTBC)); \
   }
 
-#define Guidance_SAVE_decl()                                       \
-  void GuidanceSaveOutData(Guidance &guidance,                     \
-                           guidnace_packet_t &guidance_rcs_db) {   \
-    STORE_VEC(guidance_rcs_db.guidance_UTBC, guidance.get_UTBC()); \
+#define Guidance_SAVE_decl()                                         \
+  void GuidanceSaveOutData(Guidance &guidance,                       \
+                           guidnace_packet_t &guidance_rcs_db,       \
+                           refactor_downlink_packet_t &ctl_tvc_db) { \
+    STORE_VEC(guidance_rcs_db.guidance_UTBC, guidance.get_UTBC());   \
+    ctl_tvc_db.beco_flag = guidance.get_beco_flag();                 \
   }
 
 #define INS_SAVE_decl()                                               \
@@ -94,6 +106,8 @@
     ins_ctl_db.ins_phipcx = ins.get_phipcx();                         \
     ins_ctl_db.ins_alppcx = ins.get_alppcx();                         \
     STORE_VEC(ins_ctl_db.ins_ABICB, ins.get_ABICB());                 \
+    STORE_VEC(ins_ctl_db.ins_SBIIC, ins.get_SBIIC());                 \
+    STORE_VEC(ins_ctl_db.ins_VBIIC, ins.get_VBIIC());                 \
   }
 
 #define CONTROL_SAVE_decl()                                          \

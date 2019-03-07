@@ -107,12 +107,12 @@ void TVC::algorithm(double int_step) {
       break;
     case S2_TVC:
       Q_TVC.zeros();
-      S2_Eng_list[0]->Act_list[0]->Actuate(0.0, int_step);
-      S2_Eng_list[0]->Act_list[1]->Actuate(0.0, int_step);
+      S2_Eng_list[0]->Act_list[0]->Actuate(0.0, int_step);  // Pitch angle
+      S2_Eng_list[0]->Act_list[1]->Actuate(0.0, int_step);  // Yaw angle
 
       S2_Eng_list[0]->calculate_Q(S2_Eng_list[0]->Act_list[1]->ActOuptut,
                                   S2_Eng_list[0]->Act_list[0]->ActOuptut,
-                                  thrust, TBI, -XCG(0), S2_Eng_list[0]->type);
+                                  thrust, TBI, XCG(0), S2_Eng_list[0]->type);
       ActOutput1 = S2_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S2_Eng_list[0]->Act_list[1]->ActOuptut;
 

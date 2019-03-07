@@ -36,21 +36,21 @@ const double S1_vmass0         = 48984.0;   //  Vehicle init mass
 const double S1_fmass0         = 31175.0;   //  Vehicle init fuel mass
 const double S1_RP             = -16.84;      //  reference point
 /* S2 */
-const double S2_XCG_0          = 6.1736;    //  vehicle initial xcg
-const double S2_XCG_1          = 5.914;     //  vehicle final xcg
-const double S2_MOI_ROLL_0     = 860.06;    //  vehicle initial moi in roll direction
-const double S2_MOI_ROLL_1     = 357.61;     //  vehicle final moi in roll direction
-const double S2_MOI_PITCH_0    = 18932.79;  //  vehicle initial transverse moi
-const double S2_MOI_PITCH_1    = 16238.01;   //  vehicle final transverse moi
-const double S2_MOI_YAW_0      = 18932.79;  //  vehicle initial transverse moi
-const double S2_MOI_YAW_1      = 16238.01;   //  vehicle final transverse moi
-const double S2_SPI            = 280.0;     //  Specific impusle
-const double S2_FUEL_FLOW_RATE = 26.92;     //  fuel flow rate
+const double S2_XCG_0          = 5.91;    //  vehicle initial xcg
+const double S2_XCG_1          = 4.17;     //  vehicle final xcg
+const double S2_MOI_ROLL_0     = 5.043e3;    //  vehicle initial moi in roll direction
+const double S2_MOI_ROLL_1     = 2.047e3;     //  vehicle final moi in roll direction
+const double S2_MOI_PITCH_0    = 51.91e3;  //  vehicle initial transverse moi
+const double S2_MOI_PITCH_1    = 15.53e3;   //  vehicle final transverse moi
+const double S2_MOI_YAW_0      = 51.91e3;  //  vehicle initial transverse moi
+const double S2_MOI_YAW_1      = 15.53e3;   //  vehicle final transverse moi
+const double S2_SPI            = 285.0;     //  Specific impusle
+const double S2_FUEL_FLOW_RATE = 189.1;     //  fuel flow rate
 const double S2_XCP            = 5.0384;    //  Xcp location
-const double S2_refa           = 1.45;      //  Aerodynamics reference area
-const double S2_refd           = 1.36;     //  Aerodynamics reference length
-const double S2_vmass0         = 3844.1;   //  Vehicle init mass
-const double S2_fmass0         = 2880.44;   //  Vehicle init fuel mass
+const double S2_refa           = 3.243;      //  Aerodynamics reference area
+const double S2_refd           = 2.032;     //  Aerodynamics reference length
+const double S2_vmass0         = 15490;   //  Vehicle init mass
+const double S2_fmass0         = 9552;   //  Vehicle init fuel mass
 const double S2_RP             = -9.749;     //  Reference point
 /* S3 */
 const double S3_XCG_0          = 2.6651;    //  vehicle initial xcg
@@ -187,6 +187,9 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_stage_var(S1_SPI, S1_fmass0, S1_vmass0, 0.0, S1_FUEL_FLOW_RATE, S1_XCG_0, S1_XCG_1,
                                      S1_MOI_ROLL_0, S1_MOI_ROLL_1, S1_MOI_PITCH_0, S1_MOI_PITCH_1, S1_MOI_YAW_0, S1_MOI_YAW_1, 
                                      0);
+    rkt->propulsion.set_stage_var(S2_SPI, S2_fmass0, S2_vmass0, 0.0, S2_FUEL_FLOW_RATE, S2_XCG_0, S2_XCG_1,
+                                     S2_MOI_ROLL_0, S2_MOI_ROLL_1, S2_MOI_PITCH_0, S2_MOI_PITCH_1, S2_MOI_YAW_0, S2_MOI_YAW_1, 
+                                     1);
     // rkt->dynamics.set_reference_point(S1_RP);
     rkt->dynamics.set_reference_point_eq_xcg();
     rkt->propulsion.set_stage_1();
@@ -243,11 +246,11 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     for (int i = 0; i < rkt->tvc.S1_Eng_list.size(); i++) rkt->tvc.S1_Eng_list[i]->Allocate_Actuator(2, NO_DYN);
 
     // Allocate S1 Actuator variables
-    for (int i = 0; i < rkt->tvc.S1_Eng_list.size(); i++) {
-        for (int j = 0; j < rkt->tvc.S1_Eng_list[i]->Act_list.size(); j++) {
-            rkt->tvc.S1_Eng_list[i]->Act_list[j]->set_1st_act_var(7.0 * RAD, 160000.0 * RAD, 360000.0 * RAD, 20.0);
-        }
-    }
+    // for (int i = 0; i < rkt->tvc.S1_Eng_list.size(); i++) {
+    //     for (int j = 0; j < rkt->tvc.S1_Eng_list[i]->Act_list.size(); j++) {
+    //         rkt->tvc.S1_Eng_list[i]->Act_list[j]->set_1st_act_var(7.0 * RAD, 160000.0 * RAD, 360000.0 * RAD, 20.0);
+    //     }
+    // }
     
     // Allocate S2 Actuator
     for (int i = 0; i < rkt->tvc.S2_Eng_list.size(); i++) rkt->tvc.S2_Eng_list[i]->Allocate_Actuator(2, NO_DYN);
@@ -289,14 +292,14 @@ extern "C" void master_init_rcs(Rocket_SimObject *rkt) {
 extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     /* events */
     jit_add_event("event_start", "LIFTOFF", 0.005);
-    // jit_add_event("event_separation_1", "S2", 0.005);
+    jit_add_event("event_separation_1", "S2", 0.005);
     // jit_add_event("event_separation_2", "S3", 0.005);
     // jit_add_event("event_S3_ignition", "S3IG", 0.005);
     // jit_add_read(102.051 + rkt->stand_still_time, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
     // jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.005);
     // jit_add_event("event_hot_staging", "HOT_STAGING", 0.005);
-    exec_set_terminate_time(60.001  + rkt->stand_still_time);
+    exec_set_terminate_time(65.001  + rkt->stand_still_time);
 }
 
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_

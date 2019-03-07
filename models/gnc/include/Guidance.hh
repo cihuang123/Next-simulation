@@ -17,7 +17,11 @@ class Guidance {
  public:
   Guidance();
   Guidance(const Guidance &other);
-
+  void set_guidance_var(double in1, int in2, double in3, double in4, double in5,
+                        double in6, double in7, double in8, double in9,
+                        double in10, double in11, double in12, double in13,
+                        double in14);
+  void set_ltg_guidance();
   Guidance &operator=(const Guidance &other);
 
   void default_data();
@@ -25,7 +29,7 @@ class Guidance {
 
   void guidance(double int_step);
 
-  arma::vec3 guidance_ltg(int &mprop, double int_step, double time_ltg);
+  arma::vec3 guidance_ltg(double int_step, double time_ltg);
   void guidance_ltg_tgo(double &tgop, arma::mat &BURNTN, arma::mat &L_IGRLN,
                         arma::mat &TGON, double &l_igrl, int &nstmax,
                         double &tgo, int &nst, arma::mat &TAUN, arma::mat VEXN,
@@ -64,10 +68,10 @@ class Guidance {
 
   std::function<int()> grab_mprop;
 
-  std::function<double()> grab_dbi;
-  std::function<double()> grab_dvbi;
+  // std::function<double()> grab_dbi;
+  // std::function<double()> grab_dvbi;
   std::function<double()> grab_thtvdx;
-  std::function<double()> grab_fmassr;
+  // std::function<double()> grab_fmassr;
   std::function<arma::vec3()> grab_VBIIC;
   std::function<arma::vec3()> grab_SBIIC;
   std::function<arma::mat33()> grab_TBIC;
@@ -94,6 +98,7 @@ class Guidance {
   double get_betacomx();
 
   void set_degree(double, double);
+  int get_beco_flag();
 
  private:
   /* Propagative Stats */
