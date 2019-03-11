@@ -783,8 +783,8 @@ void Guidance::guidance_ltg_crct(arma::mat &SDII, arma::mat &UD, arma::mat &UY,
   SDII = UD * dbi_desired;
 
   // generating unit base vectors ('%' overloaded arma::mat operator)
-  UY = VBIIC % SBIIC;
-  UZ = UD % UY;
+  UY = cross(VBIIC, SBIIC) / norm(cross(VBIIC, SBIIC));
+  UZ = cross(UD, UY) / norm(cross(UD, UY));
 
   // velocity-to-be-gained
   VDII = (UD * sin(thtvdx_desired * RAD) + UZ * cos(thtvdx_desired * RAD)) *
