@@ -60,19 +60,19 @@ const double S2_ENG_NUM        = 1.0;
 /* S3 */
 const double S3_XCG_0          = 2.6651;    //  vehicle initial xcg
 const double S3_XCG_1          = 2.66507;     //  vehicle final xcg
-const double S3_MOI_ROLL_0     = 74.35;    //  vehicle initial moi in roll direction
-const double S3_MOI_ROLL_1     = 37.18;     //  vehicle final moi in roll direction
-const double S3_MOI_PITCH_0    = 329.16;  //  vehicle initial transverse moi
-const double S3_MOI_PITCH_1    = 164.18;   //  vehicle final transverse moi
-const double S3_MOI_YAW_0      = 329.16;  //  vehicle initial transverse moi
-const double S3_MOI_YAW_1      = 164.18;   //  vehicle final transverse moi
-const double S3_SPI            = 290.0;     //  Specific impusle
-const double S3_FUEL_FLOW_RATE = 2.07;     //  fuel flow rate
+const double S3_MOI_ROLL_0     = 1.519e3;    //  vehicle initial moi in roll direction
+const double S3_MOI_ROLL_1     = 0.486e3;     //  vehicle final moi in roll direction
+const double S3_MOI_PITCH_0    = 5.158e3;  //  vehicle initial transverse moi
+const double S3_MOI_PITCH_1    = 2.394e3;   //  vehicle final transverse moi
+const double S3_MOI_YAW_0      = 5.158e3;  //  vehicle initial transverse moi
+const double S3_MOI_YAW_1      = 2.394e3;   //  vehicle final transverse moi
+const double S3_SPI            = 284.0;     //  Specific impusle
+const double S3_FUEL_FLOW_RATE = 44.77;     //  fuel flow rate
 const double S3_XCP            = 3.2489;    //  Xcp location
-const double S3_refa           = 1.45;      //  Aerodynamics reference area
-const double S3_refd           = 1.36;     //  Aerodynamics reference length
-const double S3_VMASS0         = 346.3;   //  Vehicle init mass
-const double S3_FMASS0         = 248.4;   //  Vehicle init fuel mass
+const double S3_refa           = 3.243;      //  Aerodynamics reference area
+const double S3_refd           = 2.032;     //  Aerodynamics reference length
+const double S3_VMASS0         = 5024.0;   //  Vehicle init mass
+const double S3_FMASS0         = 3291.0;   //  Vehicle init fuel mass
 const double S3_RP             = 3.86;
 const double S3_ENG_NUM        = 1.0;
 /* Controller setting */
@@ -233,6 +233,24 @@ extern "C" int event_s1_seperation(void) {
     return 0;
 }
 
+extern "C" int event_s2_seperation(void) {
+    fc.control.set_controller_var(S3_VMASS0, S3_FUEL_FLOW_RATE, S3_FMASS0, S3_XCG_1, S3_XCG_0, S3_SPI, 0.0);
+    fc.control.set_IBBB0(S3_MOI_ROLL_0, S3_MOI_PITCH_0, S3_MOI_YAW_0);
+    fc.control.set_IBBB1(S3_MOI_ROLL_1, S3_MOI_PITCH_1, S3_MOI_YAW_1);
+    fc.control.set_reference_point(S3_RP);
+    fc.control.set_engine_d(0.0);
+    // fc.control.set_NO_CONTROL();
+    // fc.guidance.set_guidance_var(LTG_STEP, NUM_STAGES, DBI_DESIRED, DVBI_DESIRED, THTVDX_DESIRED, DELAY_IGNITION
+    //                             , AMIN, LAMD_LIMIT, EXHAUST_VEL1, EXHAUST_VEL2, BURNOUT_EPOCH1
+    //                             , BURNOUT_EPOCH2, CHAR_TIME1, CHAR_TIME2);
+    // fc.guidance.set_ltg_guidance();
+    // fc.rcs_fc.set_mode(2);
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S2_SEPERATION;
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_S2_SEPERATION);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_S2_SEPERATION", fc.ctl_tvc_db.flight_event_code);
+    return 0;
+}
+
 extern "C" int slave_init_stage1_control(FlightComputer_SimObject *fc) {
     /* Control variable Stage2 */
     fc->control.set_controller_var(S1_VMASS0, S1_FUEL_FLOW_RATE, S1_FMASS0, S1_XCG_1, S1_XCG_0, S1_SPI, 0.0);
@@ -332,8 +350,9 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     /* events */
     jit_add_read(0.001 + fc->stand_still_time, "event_liftoff");
     jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
-    jit_add_read(61.7 + fc->stand_still_time, "event_s1_seperation");
+    jit_add_read(61.6 + fc->stand_still_time, "event_s1_seperation");
+    jit_add_read(113.14 + fc->stand_still_time, "event_s2_seperation");
 
-    exec_set_terminate_time(65.001 + fc->stand_still_time);
+    exec_set_terminate_time(185.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

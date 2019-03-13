@@ -112,7 +112,7 @@ void Guidance::guidance(double int_step) {
     }
     // calling LTG guidance after every ltg_step
     if (time_ltg > ltg_step * ltg_count) {
-      std::cout << "Called : guidance_ltg" << '\n';
+      // std::cout << "Called : guidance_ltg" << '\n';
       ltg_count++;
       UTIC = guidance_ltg(int_step, time_ltg);
       UTBC = TBIC * UTIC;

@@ -53,21 +53,21 @@ const double S2_vmass0         = 15490;   //  Vehicle init mass
 const double S2_fmass0         = 9552;   //  Vehicle init fuel mass
 const double S2_RP             = -9.749;     //  Reference point
 /* S3 */
-const double S3_XCG_0          = 2.6651;    //  vehicle initial xcg
-const double S3_XCG_1          = 2.66507;     //  vehicle final xcg
-const double S3_MOI_ROLL_0     = 74.35;    //  vehicle initial moi in roll direction
-const double S3_MOI_ROLL_1     = 37.18;     //  vehicle final moi in roll direction
-const double S3_MOI_PITCH_0    = 329.16;  //  vehicle initial transverse moi
-const double S3_MOI_PITCH_1    = 164.18;   //  vehicle final transverse moi
-const double S3_MOI_YAW_0      = 329.16;  //  vehicle initial transverse moi
-const double S3_MOI_YAW_1      = 164.18;   //  vehicle final transverse moi
-const double S3_SPI            = 290.0;     //  Specific impusle
-const double S3_FUEL_FLOW_RATE = 2.07;     //  fuel flow rate
+const double S3_XCG_0          = 3.65;    //  vehicle initial xcg
+const double S3_XCG_1          = 2.85;     //  vehicle final xcg
+const double S3_MOI_ROLL_0     = 1.519e3;    //  vehicle initial moi in roll direction
+const double S3_MOI_ROLL_1     = 0.486e3;     //  vehicle final moi in roll direction
+const double S3_MOI_PITCH_0    = 5.158e3;  //  vehicle initial transverse moi
+const double S3_MOI_PITCH_1    = 2.394e3;   //  vehicle final transverse moi
+const double S3_MOI_YAW_0      = 5.158e3;  //  vehicle initial transverse moi
+const double S3_MOI_YAW_1      = 2.394e3;   //  vehicle final transverse moi
+const double S3_SPI            = 284.0;     //  Specific impusle
+const double S3_FUEL_FLOW_RATE = 44.77;     //  fuel flow rate
 const double S3_XCP            = 3.2489;    //  Xcp location
-const double S3_refa           = 1.45;      //  Aerodynamics reference area
-const double S3_refd           = 1.36;     //  Aerodynamics reference length
-const double S3_vmass0         = 346.3;   //  Vehicle init mass
-const double S3_fmass0         = 248.4;   //  Vehicle init fuel mass
+const double S3_refa           = 3.243;      //  Aerodynamics reference area
+const double S3_refd           = 2.032;     //  Aerodynamics reference length
+const double S3_vmass0         = 5024.0;   //  Vehicle init mass
+const double S3_fmass0         = 3291;   //  Vehicle init fuel mass
 const double S3_RP             = -3.86;    //  Reference point
 
 extern "C" int event_start() {
@@ -111,7 +111,16 @@ extern "C" int event_separation_2() {
     // rkt.forces.set_reference_point(-3.917);  // set reference point
     rkt.dynamics.set_reference_point(S3_RP);
     rkt.tvc.set_S3_TVC();
-    // rkt.propulsion.engine_ignition();
+    rkt.propulsion.engine_ignition();
+
+    // Thruster 1
+    rkt.rcs.Thruster_list[0]->set_mom_max(100.0, 0.0, 0.0);
+
+    // Thruster 2
+    rkt.rcs.Thruster_list[1]->set_mom_max(0.0, 2000.0, 0.0);
+
+    // Thruster 3
+    rkt.rcs.Thruster_list[2]->set_mom_max(0.0, 0.0, 2000.0);
     return 0;
 }
 
@@ -190,6 +199,9 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_stage_var(S2_SPI, S2_fmass0, S2_vmass0, 0.0, S2_FUEL_FLOW_RATE, S2_XCG_0, S2_XCG_1,
                                      S2_MOI_ROLL_0, S2_MOI_ROLL_1, S2_MOI_PITCH_0, S2_MOI_PITCH_1, S2_MOI_YAW_0, S2_MOI_YAW_1, 
                                      1);
+    rkt->propulsion.set_stage_var(S3_SPI, S3_fmass0, S3_vmass0, 0.0, S3_FUEL_FLOW_RATE, S3_XCG_0, S3_XCG_1,
+                                     S3_MOI_ROLL_0, S3_MOI_ROLL_1, S3_MOI_PITCH_0, S3_MOI_PITCH_1, S3_MOI_YAW_0, S3_MOI_YAW_1, 
+                                     2);
     // rkt->dynamics.set_reference_point(S1_RP);
     rkt->dynamics.set_reference_point_eq_xcg();
     rkt->propulsion.set_stage_1();
@@ -293,13 +305,13 @@ extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     /* events */
     jit_add_event("event_start", "LIFTOFF", 0.005);
     jit_add_event("event_separation_1", "S2", 0.005);
-    // jit_add_event("event_separation_2", "S3", 0.005);
+    jit_add_event("event_separation_2", "S3", 0.005);
     // jit_add_event("event_S3_ignition", "S3IG", 0.005);
     // jit_add_read(102.051 + rkt->stand_still_time, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
     // jit_add_event("event_fairing_separation", "FAIRING_JETTSION", 0.005);
     // jit_add_event("event_hot_staging", "HOT_STAGING", 0.005);
-    exec_set_terminate_time(65.001  + rkt->stand_still_time);
+    exec_set_terminate_time(185.001  + rkt->stand_still_time);
 }
 
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_HANDLER_H_
