@@ -1,12 +1,12 @@
 #include <cassert>
-#include "aux.hh"
-
 #include <iostream>
+#include "aux.hh"
 #include "global_constants.hh"
 #include "integrate.hh"
 #include "math_utility.hh"
 #include "matrix/utility.hh"
 #include "sdt/SDT_NONIDEAL.hh"
+
 
 SDT_NONIDEAL::SDT_NONIDEAL(Data_exchang& input)
     : VECTOR_INIT(WBISB, 3),
@@ -49,7 +49,7 @@ SDT_NONIDEAL& SDT_NONIDEAL::operator=(const SDT_NONIDEAL& other) {
 void SDT_NONIDEAL::algorithm(double int_step) {
   data_exchang->hget("WBICB", WBISB);
   data_exchang->hget("FSPCB", FSPSB);
-  
+
   if (k == 11) {
     k = 1;
     PHI.zeros();
@@ -102,7 +102,7 @@ arma::mat33 SDT_NONIDEAL::build_321_rotation_matrix(arma::vec3 angle) {
   return TM;
 }
 
-int SDT_NONIDEAL::write_to_(const char *bus_name) {
+int SDT_NONIDEAL::write_to_(const char* bus_name) {
   int rc = 0;
   rc |= nxbus_mset(NXBUS_DOUBLE, "SDT:_PHI", 3, _PHI);
   rc |= nxbus_mset(NXBUS_DOUBLE, "SDT:_DELTA_VEL", 3, _DELTA_VEL);

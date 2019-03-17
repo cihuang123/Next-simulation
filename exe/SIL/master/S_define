@@ -16,6 +16,7 @@ LIBRARY DEPENDENCIES:
 ##include "EarthEnvironment.hh"
 ##include "Vehicle.hh"
 ##include "Module.hh"
+##include "RCS.hh"
 
 ##include "env/atmosphere.hh"
 ##include "env/atmosphere_nasa2002.hh"
@@ -48,6 +49,7 @@ LIBRARY DEPENDENCIES:
 class Rocket_SimObject : public Trick::SimObject {
     public:
         double int_step = 0.005;
+        double fc_int_step = 0.005;
         double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
         EarthEnvironment env;
@@ -57,6 +59,7 @@ class Rocket_SimObject : public Trick::SimObject {
         Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
+        RCS rcs;
         Data_exchang data_exchang;
 
         time_management *time = time_management::get_instance();
@@ -74,6 +77,12 @@ class Rocket_SimObject : public Trick::SimObject {
             tvc.grab_theta_b_cmd       = GRAB_VAR(ctl_tvc_db.theta_b_cmd);
             tvc.grab_theta_c_cmd       = GRAB_VAR(ctl_tvc_db.theta_c_cmd);
             tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
+
+            rcs.grab_e_roll            = GRAB_VAR(ctl_tvc_db.e_roll);
+            rcs.grab_e_pitch            = GRAB_VAR(ctl_tvc_db.e_pitch);
+            rcs.grab_e_yaw            = GRAB_VAR(ctl_tvc_db.e_yaw);
+
+            propulsion.grab_beco_flag = GRAB_VAR(ctl_tvc_db.beco_flag);
         };
 
         void egse_uplink_packet_transfer(struct icf_ctrlblk_t *C) {
@@ -93,7 +102,8 @@ class Rocket_SimObject : public Trick::SimObject {
                 aerodynamics( propulsion, data_exchang ) ,
                 tvc         ( data_exchang ) ,
                 gps_con     (  ),
-                dynamics    ( data_exchang )
+                dynamics    ( data_exchang ) ,
+                rcs         ( data_exchang )
             {
 
             ("initialization") link();
@@ -111,16 +121,17 @@ class Rocket_SimObject : public Trick::SimObject {
 	        P1 (int_step, "scheduled") env.algorithm(int_step);
             P1 (int_step, "scheduled") propulsion.algorithm(int_step);
             P1 (int_step, "scheduled") aerodynamics.algorithm(int_step);
-            P1 (0.005, "scheduled") gyro->algorithm(0.005);
-            P1 (0.005, "scheduled") accelerometer->algorithm(0.005);
-            P1 (0.005, "scheduled") sdt->algorithm(0.005);
+            P1 (int_step, "scheduled") gyro->algorithm(int_step);
+            P1 (int_step, "scheduled") accelerometer->algorithm(int_step);
+            P1 (int_step, "scheduled") sdt->algorithm(int_step);
 
-            P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
-            P2 (0.05, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
-            P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT8, sizeof(refactor_downlink_packet_t));
-            P2 (0.05, "scheduled") load_input(&icf_ctrl);
+            P2 (fc_int_step, "scheduled") DM_SaveOutData(dm_ins_db);
+            P2 (fc_int_step, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
+            P2 (fc_int_step, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT8, sizeof(refactor_downlink_packet_t));
+            P2 (fc_int_step, "scheduled") load_input(&icf_ctrl);
 
             P3 (int_step, "scheduled") tvc.algorithm(int_step);
+            P3 (int_step, "scheduled") rcs.algorithm(int_step);
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);

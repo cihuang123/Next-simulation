@@ -32,8 +32,9 @@ class AeroDynamics : public Dynamics {
   virtual void init();
   virtual void algorithm(double int_step);
 
-  void set_refa(double);
-  void set_refd(double);
+  void set_refa(double in);
+  void set_refd(double in);
+  void set_XCP(double in);
 
  private:
   Propulsion* propulsion;
@@ -52,6 +53,14 @@ class AeroDynamics : public Dynamics {
   double ca_on; /* *o (--)     Axial force coefficient when engine is running */
   double cnq;   /* *o (--)     Normal damping coefficient */
   double cmq;   /* *o (--)     Pitch moment derivative coefficient */
+  double ca0;
+  double caa;
+  double ca0b;
+  double cn0;
+  double clm0;
+  double clmq;
+  double cna;
+  double clma;
 
   VECTOR(XCP,
          3); /* *o (m)      Non-dimensional center of pressure (from nose)*/

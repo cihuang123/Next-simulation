@@ -101,6 +101,7 @@ Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
       VECTOR_INIT(beta_b1_q5, 3),
       VECTOR_INIT(beta_b1_q6, 3) {
   data_exchang = &input;
+  reference_point_flag = 0;
 }
 
 Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
@@ -386,8 +387,8 @@ void Rocket_Flight_DM::init() {
   arma::vec3 XCG;
   data_exchang->hget("XCG_0", XCG);
   build_WEII();
-
-  rhoC_1(0) = -XCG(0) - (-8.436);
+  reference_point_calc();
+  rhoC_1(0) = XCG(0) - reference_point;
   rhoC_1(1) = 0.0;
   rhoC_1(2) = 0.0;
 
@@ -497,11 +498,23 @@ arma::vec Rocket_Flight_DM::build_VBEB(double _alpha0x, double _beta0x,
 
 void Rocket_Flight_DM::set_reference_point(double rp) { reference_point = rp; }
 
+void Rocket_Flight_DM::set_reference_point_eq_xcg() {
+  reference_point_flag = 1;
+}
+
+void Rocket_Flight_DM::reference_point_calc() {
+  if (reference_point_flag == 0) return;
+  arma::vec3 XCG;
+  data_exchang->hget("XCG", XCG);
+  reference_point = XCG(0);
+}
+
 void Rocket_Flight_DM::algorithm(double int_step) {
   arma::vec3 VAED;
   arma::mat33 TEI;
   data_exchang->hget("TEI", TEI);
   data_exchang->hget("VAED", VAED);
+  reference_point_calc();
 
   std::vector<arma::vec> V_State_In;
   std::vector<arma::vec> V_State_Out(4);
@@ -513,6 +526,8 @@ void Rocket_Flight_DM::algorithm(double int_step) {
 
   IntegratorRK4(V_State_In, V_State_Out, &Rocket_Flight_DM::RK4F, this,
                 int_step);
+  // IntegratorEuler(V_State_In, V_State_Out, &Rocket_Flight_DM::RK4F, this,
+  //               int_step);
 
   VBIIP = V_State_Out[0];
   SBIIP = V_State_Out[1];
@@ -521,11 +536,11 @@ void Rocket_Flight_DM::algorithm(double int_step) {
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
 
   arma::vec3 rhoC_IMU;
-  arma::vec3 XCG_0;
+  arma::vec3 XCG;
 
-  data_exchang->hget("XCG_0", XCG_0);
+  data_exchang->hget("XCG", XCG);
 
-  rhoC_IMU(0) = -XCG_0(0) - (reference_point);
+  rhoC_IMU(0) = XCG(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
 
@@ -582,6 +597,7 @@ void Rocket_Flight_DM::Send() {
   data_exchang->hset("SBII", SBII);
   data_exchang->hset("dvbe", _dvbe);
   data_exchang->hset("WBIBD", WBIBD);
+  data_exchang->hset("reference_point", reference_point);
 }
 
 void Rocket_Flight_DM::propagate_TBI(double int_step, arma::vec3 WBIB_in) {
@@ -759,8 +775,9 @@ void Rocket_Flight_DM::propagate_WBIB(double int_step, arma::vec3 FMB_in,
   // integrating the angular velocity acc wrt the inertial frame in body coord
   // Using Armadillo solve for higher accuracy, otherwise will faile the 1ppm
   // test
-  INTEGRATE_MAT(WBIB, arma::solve(IBBB, (FMB_in - skew_sym(this->WBIB) * IBBB *
-                                                      this->WBIB)));
+  INTEGRATE_MAT(
+      WBIB,
+      arma::solve(IBBB, (FMB_in - skew_sym(this->WBIB) * IBBB * this->WBIB)));
 }
 
 arma::vec3 Rocket_Flight_DM::calculate_WBII(arma::mat33 TBI_in) {
@@ -801,7 +818,7 @@ double Rocket_Flight_DM::get_thtbdx_in(double &cthtbd) {
     cthtbd = cos(thtbd);
   } else {
     thtbd = PI / 2 * sign(-TBD(0, 2));
-    cthtbd = arma::datum::eps;
+    cthtbd = 1e-10;
   }
   // thtbd = asin(  2 * (TBDQ(0) * TBDQ(2) - TBDQ(1) * TBDQ(3)));
 
@@ -930,12 +947,12 @@ void Rocket_Flight_DM::RK4F(std::vector<arma::vec> Var_in,
 
   collect_forces_and_propagate();
 
-  arma::vec3 XCG_0;
+  arma::vec3 XCG;
 
-  data_exchang->hget("XCG_0", XCG_0);
+  data_exchang->hget("XCG", XCG);
   WBIBD = ddang_1;
 
-  rhoC_IMU(0) = -XCG_0(0) - (reference_point);
+  rhoC_IMU(0) = XCG(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
   arma::vec3 ddrhoC_IMU =
@@ -1343,9 +1360,10 @@ void Rocket_Flight_DM::calculate_I1() {
 
 void Rocket_Flight_DM::funcv(int n, double *x, double *ff) {
   double m1;
-  arma::vec6 Q_TVC;
+  arma::vec6 Q_TVC, Q_RCS;
   data_exchang->hget("vmass", &m1);
   data_exchang->hget("Q_TVC", Q_TVC);
+  data_exchang->hget("Q_RCS", Q_RCS);
 
   for (int i = 0; i < 3; i++) {
     ddrP_1(i) = x[i + 1];
@@ -1359,12 +1377,12 @@ void Rocket_Flight_DM::funcv(int n, double *x, double *ff) {
       m1 * (ddrP_1 + QuaternionRotation(QuaternionTranspose(TBI_Q), ddrhoC_1));
   p_b1_be = I1 * ddang_1 + cross_matrix(dang_1) * I1 * dang_1 +
             m1 * cross_matrix(rhoC_1) * QuaternionRotation(TBI_Q, ddrP_1);
-  f(0) = dot(p_b1_ga, gamma_b1_q1) - (Q_G(0) + Q_TVC(0) + Q_Aero(0));
-  f(1) = dot(p_b1_ga, gamma_b1_q2) - (Q_G(1) + Q_TVC(1) + Q_Aero(1));
-  f(2) = dot(p_b1_ga, gamma_b1_q3) - (Q_G(2) + Q_TVC(2) + Q_Aero(2));
-  f(3) = dot(p_b1_be, beta_b1_q4) - (Q_G(3) + Q_TVC(3) + Q_Aero(3));
-  f(4) = dot(p_b1_be, beta_b1_q5) - (Q_G(4) + Q_TVC(4) + Q_Aero(4));
-  f(5) = dot(p_b1_be, beta_b1_q6) - (Q_G(5) + Q_TVC(5) + Q_Aero(5));
+  f(0) = dot(p_b1_ga, gamma_b1_q1) - (Q_G(0) + Q_TVC(0) + Q_Aero(0) + Q_RCS(0));
+  f(1) = dot(p_b1_ga, gamma_b1_q2) - (Q_G(1) + Q_TVC(1) + Q_Aero(1) + Q_RCS(1));
+  f(2) = dot(p_b1_ga, gamma_b1_q3) - (Q_G(2) + Q_TVC(2) + Q_Aero(2) + Q_RCS(2));
+  f(3) = dot(p_b1_be, beta_b1_q4) - (Q_G(3) + Q_TVC(3) + Q_Aero(3) + Q_RCS(3));
+  f(4) = dot(p_b1_be, beta_b1_q5) - (Q_G(4) + Q_TVC(4) + Q_Aero(4) + Q_RCS(4));
+  f(5) = dot(p_b1_be, beta_b1_q6) - (Q_G(5) + Q_TVC(5) + Q_Aero(5) + Q_RCS(5));
 
   for (int i = 0; i < n; i++) {
     ff[i + 1] = f(i);

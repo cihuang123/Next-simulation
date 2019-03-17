@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Aerodynamics.hh"
 
 AeroDynamics::AeroDynamics(Propulsion& prop, Data_exchang& input)
@@ -58,10 +59,11 @@ void AeroDynamics::load_aerotable(const char* filename) {
 
 void AeroDynamics::set_refa(double in) { refa = in; }
 void AeroDynamics::set_refd(double in) { refd = in; }
-
+void AeroDynamics::set_XCP(double in) { XCP(0) = in; }
 void AeroDynamics::algorithm(double int_step) {
   /* only calculate when rocket liftoff */
   int liftoff;
+  int thrust_on = 0;
   data_exchang->hget("liftoff", &liftoff);
 
   if (liftoff == 1) {
@@ -86,29 +88,39 @@ void AeroDynamics::algorithm(double int_step) {
     double phip = phipx * RAD;
     double cphip = cos(phip);
     double sphip = sin(phip);
+    double qqax = WBEB(1) * cphip - WBEB(2) * sphip;
+    double rrax = WBEB(1) * sphip + WBEB(2) * cphip;
 
-    cn = aerotable.look_up("CN_vs_mach_alpha", alppx, vmach, 1);
-    ca = aerotable.look_up("CA_off_vs_mach_alpha_alt", alppx, alt, vmach, 1);
-    ca_on = aerotable.look_up("CA_on_vs_mach_alpha_alt", alppx, alt, vmach, 1);
-    // cl = aerotable.look_up("CL_vs_mach_alpha", alppx, vmach);
-    XCP(0) = aerotable.look_up("Xcp_vs_mach_alpha", alppx, vmach, 1);
-    cmq = aerotable.look_up("CMq_vs_mach", vmach, 1);
-    cnq = aerotable.look_up("CNq_vs_mach", vmach, 1);
+    // looking up axial force coefficients
+    ca0 = aerotable.look_up("ca0_vs_mach", vmach, 0);
+    caa = aerotable.look_up("caa_vs_mach", vmach, 0);
+    ca0b = aerotable.look_up("ca0b_vs_mach", vmach, 0);
 
-    if (thrust_state = Propulsion::NO_THRUST) {
-      cx = -ca;
-    } else {
-      cx = -ca_on;
-    }
+    // axial force coefficient
+    if (thrust_state = Propulsion::NO_THRUST) thrust_on = 1;
+    ca = ca0 + caa * alppx + thrust_on * ca0b;
 
-    cy = -cn * sphip + cnq * ((WBEB(2) * refd) / (2.0 * dvba));
-    cz = -cn * cphip - cnq * ((WBEB(1) * refd) / (2.0 * dvba));
+    // looking up normal force coefficients in aeroballistic coord
+    cn0 = aerotable.look_up("cn0_vs_mach_alpha", vmach, alppx, 0);
+    // normal force coefficient
+    cna = cn0;
 
-    cll = 0.0;
-    clm = cn * ((-XCG(0) / refd) - XCP(0)) * cphip +
-          cmq * ((WBEB(1) * refd) / (2.0 * dvba));
-    cln = -cn * ((-XCG(0) / refd) - XCP(0)) * sphip +
-          cmq * ((WBEB(2) * refd) / (2.0 * dvba));
+    // looking up pitching moment coefficients in aeroballistic coord
+    clm0 = aerotable.look_up("clm0_vs_mach_alpha", vmach, alppx, 0);
+    clmq = aerotable.look_up("clmq_vs_mach", vmach, 0);
+    // pitching moment coefficient
+    double clmaref = clm0 + clmq * qqax * refd / (2. * dvba);
+    clma = clmaref - cna * (XCP(0) + XCG(0)) / refd;
+
+    // converting force and moment coeff to body axes
+    // force coefficients in body axes
+    cx = -ca;
+    cy = -cna * sphip;
+    cz = -cna * cphip;
+    // moment coefficient in body axes
+    cll = 0;
+    clm = clma * cphip;
+    cln = -clma * sphip;
   }
 
   data_exchang->hset("refa", refa);

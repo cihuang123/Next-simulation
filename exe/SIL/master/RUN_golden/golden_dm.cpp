@@ -32,6 +32,7 @@ extern "C" int run_me() {
     master_init_propulsion(&rkt);
     master_init_sensors(&rkt);
     master_init_tvc(&rkt);
+    master_init_rcs(&rkt);
     flight_events_handler_configuration(&rkt);
     return 0;
 }

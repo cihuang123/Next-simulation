@@ -38,6 +38,7 @@ class Rocket_Flight_DM : public Dynamics {
   void Interpolation_Extrapolation(double T, double int_step,
                                    double ext_porlation);
   void set_reference_point(double rp);
+  void set_reference_point_eq_xcg();
 
   arma::vec3 get_VBED();
   void set_liftoff(int in);
@@ -84,6 +85,7 @@ class Rocket_Flight_DM : public Dynamics {
   void aux_calulate(arma::mat33 TEI, arma::mat33 TBI_in);
   void RK4F(std::vector<arma::vec> Var_in, std::vector<arma::vec> &Var_out);
   void Send();
+  void reference_point_calc();
 
   double calculate_alphaix(arma::vec3 VBIB);
   double calculate_betaix(arma::vec3 VBIB);
@@ -342,8 +344,9 @@ class Rocket_Flight_DM : public Dynamics {
   double Yaw;
   unsigned int Interpolation_Extrapolation_flag;
   // double xp; /* *o (m) Reference point  */
-  int its;                /* *o (--) Number of iterations */
-  int DOF;                /* *o (--)  Number of Degree of Freedom */
-  unsigned int Aero_flag; /* *o (-)  Aerodynamics flag */
+  int its;                  /* *o (--) Number of iterations */
+  int DOF;                  /* *o (--)  Number of Degree of Freedom */
+  int reference_point_flag; /* *o (--)  check if reference point equal to xcg */
+  unsigned int Aero_flag;   /* *o (-)  Aerodynamics flag */
 };
 #endif

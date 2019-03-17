@@ -14,7 +14,7 @@ class SDT_ideal : public SDT {
   TRICK_INTERFACE(SDT_ideal);
 
  public:
-  SDT_ideal(Data_exchang &input);
+  SDT_ideal(Data_exchang &input, unsigned int kl_in);
 
   SDT_ideal(const SDT_ideal &other);
 
@@ -46,8 +46,6 @@ class SDT_ideal : public SDT {
 
   VECTOR(FSPSB_old, 3); /* *o  (m/s2)    Previous Specific force of body frame
                            sensed by accelerometer */
-
-  unsigned int k; /* *o (--)       calculate index */
 };
 
 #endif

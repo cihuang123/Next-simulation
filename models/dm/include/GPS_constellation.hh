@@ -161,10 +161,10 @@ class GPS_constellation {
 
   int allocatedSat[MAX_SAT]; /* *o (--)                       */
 
-  double gdop;             /* *io  (--)  Geometric Dilution of Precsision */
+  double gdop;         /* *io  (--)  Geometric Dilution of Precsision */
   uint32_t gps_update; /* *o (--)       GPS update? > 0 updated */
-                           // arma::vec azel;
-                           // double _azel[2];
+                       // arma::vec azel;
+                       // double _azel[2];
 
   // arma::vec clk;
   // double _clk[2];

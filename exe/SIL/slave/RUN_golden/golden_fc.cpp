@@ -17,7 +17,7 @@ extern "C" int run_me() {
     /* GPS */
     slave_init_gps_fc_variable(&fc);
 
-    slave_init_stage2_control(&fc);
+    slave_init_stage1_control(&fc);
     /* events */
     flight_events_trigger_configuration(&fc);
     return 0;
