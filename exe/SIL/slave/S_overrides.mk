@@ -19,5 +19,6 @@ $(info TOP_DIR = $(TOP_DIR))
 include $(TOP_DIR)/exe/xil_common/makefile/cmm_model.mk
 include $(TOP_DIR)/exe/xil_common/makefile/sil_model.mk
 include $(TOP_DIR)/exe/xil_common/makefile/cmm_flags.mk
+include $(TOP_DIR)/exe/xil_common/makefile/ros_model.mk
 #MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 #SIM_ROOT = $(patsubst %/exe/SIL/master/S_overrides.mk, %, $(MKFILE_PATH))

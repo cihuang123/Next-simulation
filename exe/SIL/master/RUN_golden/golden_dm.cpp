@@ -19,7 +19,7 @@ extern "C" int run_me() {
     record_golden();
     record_report();
     // external_clock_switch(&rkt.ext_clk);
-    // realtime();
+    //  realtime();
     master_startup(&rkt);
     fprintf(stderr, "time_tic_value = %d tics per seconds\n", exec_get_time_tic_value());
     fprintf(stderr, "software_frame = %lf second per frame.\n", exec_get_software_frame());

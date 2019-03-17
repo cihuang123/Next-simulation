@@ -10,7 +10,7 @@
 
 extern "C" int run_me() {
     record_gps_slave();
-    // realtime();
+    //  realtime();
     slave_init_time(&fc);
     /* INS */
     slave_init_ins_variable(&fc);

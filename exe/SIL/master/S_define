@@ -45,6 +45,8 @@ LIBRARY DEPENDENCIES:
 ##include "DM_FSW_Interface.hh"
 ##include "flight_events_define.h"
 ##include "nxbus_engine.h"
+##include "ros_framework.hh"
+##include "ros_publish.hh"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -71,6 +73,8 @@ class Rocket_SimObject : public Trick::SimObject {
         struct icf_ctrlblk_t   icf_ctrl;
         uint64_t egse_flight_event_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
         uint64_t flight_event_code_record = 0;
+        RosFramework dm_node;
+        RosPublish dm_node_pub;
 
         void link(){
             tvc.grab_theta_a_cmd       = GRAB_VAR(ctl_tvc_db.theta_a_cmd);
@@ -102,8 +106,10 @@ class Rocket_SimObject : public Trick::SimObject {
                 aerodynamics( propulsion, data_exchang ) ,
                 tvc         ( data_exchang ) ,
                 gps_con     (  ),
-                dynamics    ( data_exchang ) ,
-                rcs         ( data_exchang )
+                rcs         ( data_exchang ),
+                dynamics    ( data_exchang ),
+                dm_node("dm_node") ,
+                dm_node_pub()
             {
 
             ("initialization") link();
@@ -116,6 +122,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gyro->init();
             ("initialization") accelerometer->init();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
+            ("initialization") dm_node_pub.init() ;
 
             P1 (int_step, "scheduled") time->dm_time(int_step);
 	        P1 (int_step, "scheduled") env.algorithm(int_step);
@@ -124,6 +131,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (int_step, "scheduled") gyro->algorithm(int_step);
             P1 (int_step, "scheduled") accelerometer->algorithm(int_step);
             P1 (int_step, "scheduled") sdt->algorithm(int_step);
+            P1 (0.5, "scheduled") dm_node_pub.publish();
 
             P2 (fc_int_step, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (fc_int_step, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
@@ -135,6 +143,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
+            ("shutdown") dm_node.shutdown();
         }
 };
 
