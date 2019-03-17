@@ -120,6 +120,23 @@ extern "C" int event_acc_on(void) {
     return 0;
 }
 
+extern "C" int event_UECO(void) {
+
+    if (fc.guidance.get_beco_flag()) {
+        if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_CODE_UECO, fc.egse_flight_event_trigger_bitmap, FLIGHT_EVENT_CODE_UECO))
+        return 0;
+    } else {
+        return 0;
+    }
+
+    fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_UECO;
+    fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_UECO);
+    PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_UECO", fc.ctl_tvc_db.flight_event_code);
+    fc.rcs_fc.set_mode(3);
+
+    return 0;
+}
+
 // extern "C" int event_s2_control_on(void) {
 //     fc.control.set_S2_ROLL_CONTROL();
 //     // fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_S2_ROLL_CONTROL;
@@ -352,7 +369,7 @@ extern "C" void flight_events_trigger_configuration(FlightComputer_SimObject *fc
     jit_add_read(10.001 + fc->stand_still_time, "event_acc_on");
     jit_add_read(61.6 + fc->stand_still_time, "event_s1_seperation");
     jit_add_read(113.14 + fc->stand_still_time, "event_s2_seperation");
-
+    jit_add_event("event_UECO", "UECO", 0.05);
     exec_set_terminate_time(185.001 + fc->stand_still_time);
 }
 #endif  //  EXE_XIL_COMMON_INCLUDE_FLIGHT_EVENTS_TRIGGER_H_

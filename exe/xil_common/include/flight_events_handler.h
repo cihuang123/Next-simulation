@@ -80,6 +80,15 @@ extern "C" int event_start() {
     return 0;
 }
 
+extern "C" int enevt_UECO() {
+    if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_CODE_UECO, rkt.egse_flight_event_handler_bitmap, rkt.flight_event_code_record))
+        return 0;
+    rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_UECO);
+    PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
+    rkt.propulsion.set_no_thrust();
+
+    return 0;
+}
 
 extern "C" int event_separation_1() {
     if (!IS_FLIGHT_EVENT_ARRIVED(FLIGHT_EVENT_CODE_S1_SEPERATION, rkt.egse_flight_event_handler_bitmap, rkt.flight_event_code_record))
@@ -306,6 +315,7 @@ extern "C" void flight_events_handler_configuration(Rocket_SimObject *rkt) {
     jit_add_event("event_start", "LIFTOFF", 0.005);
     jit_add_event("event_separation_1", "S2", 0.005);
     jit_add_event("event_separation_2", "S3", 0.005);
+    jit_add_event("enevt_UECO", "UECO", 0.005);
     // jit_add_event("event_S3_ignition", "S3IG", 0.005);
     // jit_add_read(102.051 + rkt->stand_still_time, "event_S3_ignition");
     // jit_add_read(107.001, "event_fairing_separation");
