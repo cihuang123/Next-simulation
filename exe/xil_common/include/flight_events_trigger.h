@@ -132,7 +132,7 @@ extern "C" int event_UECO(void) {
     fc.ctl_tvc_db.flight_event_code = FLIGHT_EVENT_CODE_UECO;
     fc.egse_flight_event_trigger_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_UECO);
     PRINT_FLIGHT_EVENT_MESSAGE("FC", exec_get_sim_time(), "FLIGHT_EVENT_CODE_UECO", fc.ctl_tvc_db.flight_event_code);
-    fc.rcs_fc.set_mode(3);
+    fc.rcs_fc.disable_rcs();
 
     return 0;
 }

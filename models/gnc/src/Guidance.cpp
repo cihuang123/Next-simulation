@@ -280,6 +280,7 @@ arma::vec3 Guidance::guidance_ltg(double int_step, double time_ltg) {
   // cut-off logic
   if (tgo < ltg_step) {
     beco_flag = 1;
+    mguide = 0;
   }
   // boost engine cut-off print-out
   double ddb(0);
